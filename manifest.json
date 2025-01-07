@@ -1,0 +1,47 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+
+  "name": "Timetable Tools",
+  
+  "short_name": "Timetable Tools",
+
+  "version": "2.3.0",
+  
+  "description": "Export term schedules as standard calendar files for seamless import.",
+ 
+  "icons": {
+    "48": "images/calendar256.png",
+    "128": "images/calendar256.png"
+  },
+
+  "permissions": ["scripting", "storage", "activeTab", "webNavigation"],
+
+  "host_permissions": ["<all_urls>"],
+
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts; 'unsafe-inline' 'self'"
+  },
+  
+  "background": {
+      "service_worker": "background.js"
+    },
+  "action": {
+    "default_title": "Timetable Tools",
+    "default_icon": "images/calendar256.png",
+    "default_popup": "popup.html"
+  },
+  
+  "web_accessible_resources": [{
+    "resources": [
+      "*.html",
+      "*.woff2",
+      "*.tff",
+      "images/*",
+      "*.js",
+      "styles/*"
+    ],
+    "matches": ["<all_urls>"]
+  }]
+}
