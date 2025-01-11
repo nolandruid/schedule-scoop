@@ -7,9 +7,9 @@
   
   "short_name": "Timetable Tools",
 
-  "version": "2.3.1",
+  "version": "2.3.2",
   
-  "description": "Export term schedules as standard calendar files for seamless import.",
+  "description": "Export Timetables",
  
   "icons": {
     "48": "images/calendar256.png",
@@ -18,7 +18,7 @@
 
   "permissions": ["scripting", "storage", "activeTab", "webNavigation"],
 
-  "host_permissions": ["https://*.carleton.ca/*"],
+  "host_permissions": ["<all_urls>"],
 
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; 'unsafe-inline' 'self'"
