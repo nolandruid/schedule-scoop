@@ -64,6 +64,7 @@ body {
   cursor: pointer;
   font-size: smaller;
   transition: all 0.2s ease;
+  will-change: transform;
 }
 
 .version-details span:hover{
