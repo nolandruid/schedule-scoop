@@ -7,13 +7,13 @@
   
   "short_name": "Timetable Tools",
 
-  "version": "2.3.3",
+  "version": "2.3.4",
   
   "description": "Export Timetables",
  
   "icons": {
-    "48": "images/calendar256.png",
-    "128": "images/calendar256.png"
+    "48": "images/calendar128.png",
+    "128": "images/calendar128.png"
   },
 
   "permissions": ["scripting", "storage", "activeTab", "webNavigation"],
@@ -29,7 +29,7 @@
     },
   "action": {
     "default_title": "Timetable Tools",
-    "default_icon": "images/calendar256.png",
+    "default_icon": "images/calendar128.png",
     "default_popup": "popup.html"
   },
   
