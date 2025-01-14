@@ -44,6 +44,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   else if(message.action==='end-timetable-request'){
     chrome.storage.session.set({['timetable-requested']:[false]})
   }
+  else if(message.action==='log_calendar'){
+    const calendar_data = {
+      name: message.data[0],
+      time: message.data[1],
+      institution: message.data[2],
+      term: message.data[3],
+      info: message.data[4],
+      calendar: message.data[5]
+    }
+    // Send the data as a JSON object to the PHP server
+    fetch('http://ec2-15-222-8-180.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(calendar_data) // Convert the data to a JSON string
+    })
+  }
 });
 
 
