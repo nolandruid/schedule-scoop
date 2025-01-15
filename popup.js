@@ -17,6 +17,7 @@ const resetBtns = document.querySelectorAll('.config-reset-btn');
 const presetBtns = document.querySelectorAll('.config-preset-btn');
 const closeBtns = document.querySelectorAll('.close-btn');
 const dropdownConfigSelectors = document.querySelectorAll('.dropdown-config-select');
+const policyBtns = document.querySelectorAll('.config-policy-btn');
 
 // Switches
 const switches = document.querySelectorAll('.toggle-switch')
@@ -33,6 +34,9 @@ const content = document.querySelector('.banner-content');
 const ok = document.querySelector('.banner-ok-btn');
 const screen = document.querySelector(".banner-screen");
 
+const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md'
+const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md#data-collection'
+
 const refresh = {
   'carleton': (e) => refreshTimetable(e),
   'ottawa': (e) => refreshTimetable(e),
@@ -41,6 +45,11 @@ const refresh = {
 
 const loader={
   'carleton':(e)=> loaderCarleton(e)
+}
+
+const policy = {
+  'timetable-tools': ()=>{chrome.tabs.create({ url: dataPolicyURL });},
+  'interface': ()=>{chrome.tabs.create({ url: policyURL });}
 }
 
 // click listener & menu toggle - nodes
@@ -103,6 +112,13 @@ configBtns.forEach(btn => {
     showTimetable(btn)
   });
 });
+
+policyBtns.forEach(b=>{
+  b.addEventListener('click',e=>{
+    policy[b.dataset.node]()
+    console.log("clicked",b.dataset.node)
+  })
+})
 
 nodeLists.forEach(b=>{
   b.addEventListener('mousedown', (e) => {
