@@ -740,6 +740,7 @@ body {
 .info-btn:hover{
   transform: scale(1.1);
   color: rgb(255, 217, 0);
+  cursor: pointer;
 }
 
 .info-btn:active{
