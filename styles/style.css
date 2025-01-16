@@ -929,3 +929,97 @@ input:checked + .toggle-switch::before{
   display: none;
 }
 
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background-color: #2d274a;
+  color: #fff;
+  border-radius: 10px;
+  border-color: #858585;
+  border-style: hidden;
+  border-width: thin;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1002;
+  padding: 5px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+}
+
+.modal-content p {
+  text-align: center;
+}
+
+.modal-content label {
+  justify-content: center;
+  text-align: center;
+}
+
+.modal-content label a {
+  color: inherit; /* Inherit the color from the surrounding text */
+  text-decoration: none; /* Underline the text */
+}
+
+.modal-content label a:hover {
+  color: inherit; /* Keep the same color on hover */
+  text-decoration: underline; /* Keep the underline on hover */
+}
+
+.modal-content input[type="checkbox"] {
+  vertical-align: middle; /* Align the checkbox vertically in the middle */
+}
+
+.modal-content a {
+  color: #2af85d;
+  text-decoration: underline;
+}
+
+.modal-content a:hover {
+  color: #7eff9c;
+}
+
+.modal-content button {
+  padding: 8px 15px;
+  background-color: #1d1f52;
+  color: #fff;
+  border: solid;
+  border-color: #c0c0c0;
+  border-width: 2px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  justify-content: center;
+}
+
+.modal-content button:not(:disabled):hover {
+  background-color: #333181;
+  transform: scale(1.1);
+}
+
+.modal-content button:not(:disabled):active {
+  background-color: #43408e;
+  transition: all 0.1s ease;
+  transform: scale(1.15);
+}
+
+.modal-content button:disabled{
+  background-color: #cccccc; /* Gray background */
+  color: #666666; /* Darker text color */
+  cursor: not-allowed; /* Change cursor to indicate disabled state */
+  opacity: 0.6; /* Reduce opacity */
+}

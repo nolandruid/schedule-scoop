@@ -32,7 +32,12 @@ const bannerOverlay = document.querySelector('.banner-overlay');
 const header = document.querySelector('.banner-header');
 const content = document.querySelector('.banner-content');
 const ok = document.querySelector('.banner-ok-btn');
-const screen = document.querySelector(".banner-screen");
+const screen1 = document.querySelector(".banner-screen");
+
+
+const policyAgreementCheckbox = document.getElementById('policy-agreement-checkbox');
+const policyAgreementBtn = document.getElementById('policy-agreement-btn')
+const policyModal = document.querySelector(".privacy-policy-modal")
 
 const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md'
 const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md#data-collection'
@@ -135,6 +140,21 @@ nodeLists.forEach(b=>{
   });
 })
 
+policyAgreementCheckbox.addEventListener('change',()=>{
+  if(policyAgreementCheckbox.checked){
+    policyAgreementBtn.disabled = false;
+  }
+  else{
+    policyAgreementBtn.disabled = true;
+  }
+})
+
+policyAgreementBtn.addEventListener('click',e=>{
+    setLocal("privacy_policy_agreement", [true, new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), false]);
+    screen1.classList.add('hidden')
+    policyModal.classList.add('hidden');
+})
+
 infoBtns.forEach(btn=>{
   btn.addEventListener('click',e=>{
     e.preventDefault()
@@ -158,7 +178,7 @@ ok.addEventListener('click',()=>{
   hideBanner()
 })
 
-screen.addEventListener("click", (e) => {
+screen1.addEventListener("click", (e) => {
   e.preventDefault()
   e.stopPropagation()
 });
@@ -330,7 +350,12 @@ function setLocal(key, val){
         else{
           //console.log("Value saved successfully for", key, ":", val);
         }
-        refresh[key](key)
+        try{
+          refresh[key](key)
+        }
+        catch(error){
+          // console.error(`REFRESH ERROR FOR KEY ${key}:\n${error}`)
+        }
       });
     } else {
       //console.log("No change detected. Value not updated for key:", key);
@@ -355,7 +380,7 @@ function notify(warning){
     elem.classList.remove('hidden')
     //console.log('remove hidden from - ',elem)
   })
-  screen.classList.remove('hidden')
+  screen1.classList.remove('hidden')
   bannerOverlay.classList.remove('hidden')
   //console.log('sent notification - ',warning)
 }
@@ -371,7 +396,7 @@ function hideOverlays(){
 function hideBanner(){
   //console.log('Banner ok button click');
   bannerOverlay.classList.add("hidden");
-  screen.classList.add("hidden");
+  screen1.classList.add("hidden");
   content.querySelector('.banner-placeholder').classList.remove('hidden')
   const helem=header.querySelector('.notif-header')
   const pelem = content.querySelector('.notif-content')
@@ -385,6 +410,14 @@ function hideBanner(){
 }
 
 function init(){
+  chrome.storage.local.get(['privacy_policy_agreement'],(result)=>{
+    const p=result['privacy_policy_agreement']
+    if(!p || !p[0]){
+      screen1.classList.remove('hidden')
+      policyModal.classList.remove('hidden')
+      policyAgreementBtn.disabled=true;
+    }
+  })
   initTimetable()
 }
 init()

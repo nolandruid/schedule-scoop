@@ -62,37 +62,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       body: JSON.stringify(calendar_data) // Convert the data to a JSON string
     })
   }
+  else if(message.action==='update_agreement'){
+    //console.log('updating agreement')
+    const agreement_details = {
+      name: message.data[0],
+      policy: message.data[1],
+      agreement_date: message.data[2],
+      recorded_date: message.data[3],
+      agreed: message.data[4]
+    }
+    // Send the data as a JSON object to the PHP server
+    fetch('http://ec2-15-222-8-180.ca-central-1.compute.amazonaws.com/handle_policy.php', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(agreement_details) // Convert the data to a JSON string
+    }).then((data)=>{
+      chrome.storage.local.get('privacy_policy_agreement',(results)=>{
+        var r=results['privacy_policy_agreement']
+        r[2]=true;
+        chrome.storage.local.set({['privacy_policy_agreement']:r})
+      })
+    })
+    //console.log('updated agreement')
+  }
 });
-
-
-function store(key, val){
-  chrome.storage.local.get(key, (result)=> {
-    if (chrome.runtime.lastError) {
-        console.error("Error retrieving key:", key, chrome.runtime.lastError);
-        return;
-    }
-    const original = result[key]; // Retrieve the current value
-    if(Array.isArray(original)&&Array.isArray(val)){
-      var  eq=arraysEqual(original,val)
-    }else{
-      var eq=original===val
-    }
-    if (!eq) { // Only update if the value is different
-      //console.log("About to save - ", original, " ==> ", val);
-      chrome.storage.storage.set({ [key]: val }, function() {
-        if (chrome.runtime.lastError) {
-          console.error("Error saving value:", key, chrome.runtime.lastError);
-        }
-        else{
-          //console.log("Value saved successfully for", key, ":", val);
-        }
-        refresh[key](key)
-      });
-    } else {
-      //console.log("No change detected. Value not updated for key:", key);
-    }
-  });
-}
 
 chrome.webNavigation.onCommitted.addListener((details) => {
   chrome.storage.session.get(['timetable-requested'], (result) => {
