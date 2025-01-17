@@ -121,7 +121,7 @@ configBtns.forEach(btn => {
 policyBtns.forEach(b=>{
   b.addEventListener('click',e=>{
     policy[b.dataset.node]()
-    console.log("clicked",b.dataset.node)
+    // console.log("clicked",b.dataset.node)
   })
 })
 
@@ -150,9 +150,12 @@ policyAgreementCheckbox.addEventListener('change',()=>{
 })
 
 policyAgreementBtn.addEventListener('click',e=>{
-    setLocal("privacy_policy_agreement", [true, new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), false]);
+  e.preventDefault()
+  if(policyAgreementCheckbox.checked){
+    setLocal("privacy_policy_agreement", [policyAgreementCheckbox.checked, new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), false]);
     screen1.classList.add('hidden')
     policyModal.classList.add('hidden');
+  }
 })
 
 infoBtns.forEach(btn=>{

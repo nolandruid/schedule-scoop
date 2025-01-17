@@ -961,17 +961,18 @@ input:checked + .toggle-switch::before{
   text-align: center;
 }
 
-.modal-content label {
+.modal-content div {
   justify-content: center;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
-.modal-content label a {
+.modal-content div a {
   color: inherit; /* Inherit the color from the surrounding text */
   text-decoration: none; /* Underline the text */
 }
 
-.modal-content label a:hover {
+.modal-content div a:hover {
   color: inherit; /* Keep the same color on hover */
   text-decoration: underline; /* Keep the underline on hover */
 }
