@@ -5,12 +5,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }else{
       key = 'tempTimetableCU'
     }
-    chrome.storage.session.get(key,(result)=>{
-      var temp = result[key]?result[key]:[];
-      newTempTab = message.tab
-      temp.push(newTempTab)
-      chrome.storage.session.set({[key]: temp},()=>{
-        //console.log('Tracking new,',key,'tab:',newTempTab,'.\nTotal:',temp)
+    chrome.tabs.create({ url:message.login },(tab)=>{
+      chrome.storage.session.get(key,(result)=>{
+        var temp = result[key]?result[key]:[];
+        newTempTab = tab
+        temp.push(newTempTab)
+        chrome.storage.session.set({[key]: temp},()=>{
+          //console.log('Tracking new,',key,'tab:',newTempTab,'.\nTotal:',temp)
+        })
       })
     })
   }
