@@ -56,7 +56,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       calendar: message.data[5]
     }
     // Send the data as a JSON object to the PHP server
-    fetch('http://ec2-15-222-8-180.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
+    fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -74,7 +74,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       agreed: message.data[4]
     }
     // Send the data as a JSON object to the PHP server
-    fetch('http://ec2-15-222-8-180.ca-central-1.compute.amazonaws.com/handle_policy.php', {
+    fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_policy.php', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
