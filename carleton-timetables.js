@@ -403,21 +403,21 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
       }
       
       // Sample timetable data
-      const tempTimetable = [
-        {
-          courseName: "Introduction to Computer Science II",
-          courseCode: "COMP 1406",
-          courseSection: "E",
-          crn: "11164",
-          instructor: "Farah H. Chanchary",
-          classStartTime: "2:35 pm",
-          classEndTime: "3:55 pm",
-          daysOfTheWeek: "MW",
-          location: "Nicol Building 4010",
-          startDate: "2025-01-06T05:00:00.000Z",
-          endDate: "2025-04-08T04:00:00.000Z"
-        }
-      ];
+      // const tempTimetable = [
+      //   {
+      //     courseName: "Introduction to Computer Science II",
+      //     courseCode: "COMP 1406",
+      //     courseSection: "E",
+      //     crn: "11164",
+      //     instructor: "Farah H. Chanchary",
+      //     classStartTime: "2:35 pm",
+      //     classEndTime: "3:55 pm",
+      //     daysOfTheWeek: "MW",
+      //     location: "Nicol Building 4010",
+      //     startDate: "2025-01-06T05:00:00.000Z",
+      //     endDate: "2025-04-08T04:00:00.000Z"
+      //   }
+      // ];
       createICal(timetable);
       chrome.runtime.sendMessage({action:'end-timetable-request'})
       chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
