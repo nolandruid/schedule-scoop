@@ -448,21 +448,17 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     return `${sem} ${term[1]}`
   }
 
-  function delay(ms){
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
   function getDefaultTerm() {
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
     let year = String(currentDate.getFullYear());
     let term;
   
-    if (month >= 1 && month <= 4) {
+    if (month >= 1 && month <= 3) {
       term = '10';
-    } else if (month >= 5 && month <= 8) {
+    } else if (month >= 4 && month <= 7) {
       term = '20';
-    } else if (month >= 9 && month <= 11) {
+    } else if (month >= 8 && month <= 11) {
       term = '30';
     } else if (month === 12) {
       term = '10';
