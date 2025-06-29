@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carleton Schedule Exporter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      width: 400px;
+      min-height: 500px;
+      background: white;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin: -20px -20px 20px -20px;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .logo-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .action-card {
+      background: #f8faff;
+      border: 2px solid #e1e8ff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .card-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .term-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e1e8ff;
+    }
+
+    .term-info span {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+    }
+
+    .calendar-options {
+      margin-bottom: 20px;
+    }
+
+    .calendar-options h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .calendar-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-calendar {
+      padding: 12px 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .btn-calendar:hover {
+      border-color: #667eea;
+      background: #f8faff;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 300px;
+      padding: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .term-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .term-selector label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .term-selector select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    /* Remove any animations that might cause shaking */
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <img src="images/sky-icon.png" alt="Schedule Exporter" class="logo-img">
+        <h1>Schedule Exporter</h1>
+      </div>
+      <p class="subtitle">Export your Carleton schedule to any calendar</p>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="action-card">
+      <div class="card-header">
+        <h2>Export Schedule</h2>
+      </div>
+      <p>Get your current term schedule as a calendar file</p>
+      <button id="export-btn" class="btn-primary">
+        Export Current Term
+      </button>
+      <div class="term-info">
+        <span id="current-term">Winter 2025</span>
+        <button id="change-term-btn" class="btn-link">Change</button>
+      </div>
+    </div>
+
+    <!-- Quick Calendar Import -->
+    <div class="calendar-options">
+      <h3>Quick Import To:</h3>
+      <div class="calendar-buttons">
+        <button id="google-btn" class="btn-calendar">
+          Google
+        </button>
+        <button id="outlook-btn" class="btn-calendar">
+          Outlook
+        </button>
+        <button id="apple-btn" class="btn-calendar">
+          Apple
+        </button>
+        <button id="notion-btn" class="btn-calendar">
+          Notion
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Term Selection Modal -->
+  <div id="term-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Select Term</h3>
+        <button id="close-modal-btn" class="btn-close">&times;</button>
+      </div>
+      <div class="term-selector">
+        <label>
+          Semester:
+          <select id="semester-select">
+            <option value="10">Winter</option>
+            <option value="20">Summer</option>
+            <option value="30">Fall</option>
+          </select>
+        </label>
+        <label>
+          Year:
+          <select id="year-select">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </label>
+      </div>
+      <button id="save-term-btn" class="btn-primary">Save Term</button>
+    </div>
+  </div>
+
+  <script src="src/popup-minimal.js"></script>
+</body>
+</html>

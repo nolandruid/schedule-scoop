@@ -101,47 +101,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.storage.session.set({['timetable-requested']:[false]})
   }
   else if(message.action==='log_calendar'){
-    const calendar_data = {
-      name: message.data[0],
-      time: message.data[1],
+    // Privacy-first: Store export history locally only
+    const export_record = {
+      timestamp: new Date().toISOString(),
       institution: message.data[2],
       term: message.data[3],
-      info: message.data[4],
-      calendar: message.data[5]
+      course_count: (message.data[4].match(/\.\.\./g) || []).length
     }
-    // Send the data as a JSON object to the PHP server
-    fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(calendar_data) // Convert the data to a JSON string
-    })
+    
+    chrome.storage.local.get('export_history', (result) => {
+      const history = result.export_history || [];
+      history.unshift(export_record);
+      // Keep only last 10 exports
+      const trimmed_history = history.slice(0, 10);
+      chrome.storage.local.set({export_history: trimmed_history});
+    });
   }
   else if(message.action==='update_agreement'){
-    //console.log('updating agreement')
-    const agreement_details = {
-      name: message.data[0],
-      policy: message.data[1],
-      agreement_date: message.data[2],
-      recorded_date: message.data[3],
-      agreed: message.data[4]
-    }
-    // Send the data as a JSON object to the PHP server
-    fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_policy.php', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(agreement_details) // Convert the data to a JSON string
-    }).then((data)=>{
-      chrome.storage.local.get('privacy_policy_agreement',(results)=>{
-        var r=results['privacy_policy_agreement']
-        r[2]=true;
-        chrome.storage.local.set({['privacy_policy_agreement']:r})
-      })
-    })
-    //console.log('updated agreement')
+    // Store privacy agreement locally only
+    chrome.storage.local.set({
+      privacy_policy_agreement: [true, new Date().toISOString(), true]
+    });
   }
 });
 

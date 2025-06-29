@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carleton Schedule Exporter</title>
+  <link rel="stylesheet" href="styles/clean-style.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <img src="images/sky-icon.png" alt="Schedule Exporter" class="logo-img">
+        <h1>Schedule Exporter</h1>
+      </div>
+      <p class="subtitle">Export your Carleton schedule to any calendar</p>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="main-section">
+      <div class="action-card primary-action">
+        <div class="card-header">
+          <i class='bx bx-calendar-event'></i>
+          <h2>Export Schedule</h2>
+        </div>
+        <p>Get your current term schedule as a calendar file</p>
+        <button id="export-schedule" class="btn-primary">
+          <i class='bx bx-download'></i>
+          Export Current Term
+        </button>
+        <div class="term-info">
+          <span id="current-term">Winter 2025</span>
+          <button id="change-term" class="btn-link">Change</button>
+        </div>
+      </div>
+
+      <!-- Quick Calendar Import -->
+      <div class="calendar-options">
+        <h3>Quick Import To:</h3>
+        <div class="calendar-buttons">
+          <button id="google-calendar" class="btn-calendar google">
+            <i class='bx bxl-google'></i>
+            Google
+          </button>
+          <button id="outlook-calendar" class="btn-calendar outlook">
+            <i class='bx bxl-microsoft'></i>
+            Outlook
+          </button>
+          <button id="apple-calendar" class="btn-calendar apple">
+            <i class='bx bxl-apple'></i>
+            Apple
+          </button>
+          <button id="notion-calendar" class="btn-calendar notion">
+            <i class='bx bx-notepad'></i>
+            Notion
+          </button>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div class="export-options" id="export-options" style="display: none;">
+        <h3>Export Format</h3>
+        <div class="format-options">
+          <label class="format-option">
+            <input type="radio" name="format" value="ics" checked>
+            <span>Calendar File (.ics)</span>
+            <small>Works with all calendar apps</small>
+          </label>
+          <label class="format-option">
+            <input type="radio" name="format" value="csv">
+            <span>Spreadsheet (.csv)</span>
+            <small>For Excel, Google Sheets</small>
+          </label>
+        </div>
+        
+        <div class="export-mode">
+          <label class="checkbox-option">
+            <input type="checkbox" id="combined-export" checked>
+            <span>Single file for all courses</span>
+            <small>Uncheck for separate files per course</small>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-section" id="status-section" style="display: none;">
+      <div class="status-message" id="status-message"></div>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings-section">
+      <button id="show-history" class="btn-secondary">
+        <i class='bx bx-history'></i>
+        Export History
+      </button>
+      <button id="privacy-info" class="btn-secondary">
+        <i class='bx bx-shield-check'></i>
+        Privacy Info
+      </button>
+    </div>
+  </div>
+
+  <!-- Term Selection Modal -->
+  <div id="term-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Select Term</h3>
+        <button id="close-modal" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="term-selector">
+          <label>
+            Semester:
+            <select id="semester-select">
+              <option value="10">Winter</option>
+              <option value="20">Summer</option>
+              <option value="30">Fall</option>
+            </select>
+          </label>
+          <label>
+            Year:
+            <select id="year-select">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+            </select>
+          </label>
+        </div>
+        <button id="save-term" class="btn-primary">Save Term</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/simple-popup.js"></script>
+</body>
+</html>

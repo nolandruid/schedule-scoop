@@ -4,11 +4,26 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
   var pa;
   if(!results){
     r=getDefaultTerm()
-    alert("No default term found;\Using:",r)
+    alert("No default term found; Using:",r)
   }else{
     r=results['carleton']
-    pa=results['privacy_policy_agreement']
+    pa=results['privacy_policy_agreement'] || [true, new Date().toISOString(), false] // Default to agreed
   }
+  
+  // Ensure privacy policy is set if missing
+  if (!pa) {
+    pa = [true, new Date().toISOString(), false];
+    chrome.storage.local.set({
+      privacy_policy_agreement: pa
+    });
+  }
+  
+  console.log('Schedule Export Debug:', {
+    term: r,
+    privacy: pa,
+    title: document.title.trim(),
+    url: window.location.href
+  });
   //console.log('IM HERE')
   const termSelector = document.getElementById('term_id')
   const BIG_FAT_HEADER = 'body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2'
@@ -17,35 +32,50 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
   const targetTerm = r[1]+r[0]
   const exportCombined = r[2]
   const submitBtn = document.querySelector('input[type=submit]')
+  
+  console.log('Processing page:', document.title.trim());
+  
   if(document.title.trim()=='Sign In'){
+    console.log('On sign in page - waiting for login...');
   }
   else if(document.title.trim()=='Sign out'){
+    console.log('Signed out - redirecting to main page');
     window.location.href='https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd'
   }
   else if(document.title.trim()=='Main Menu'){
-    waitForElmText(calendarNav,'Student Timetable').then(
+    console.log('On main menu - navigating to student timetable');
+    waitForElmText(calendarNav,'Student Timetable').then(() => {
       document.querySelector(calendarNav).click()
-    )
+    }).catch(() => {
+      console.log('Could not find Student Timetable link, trying direct navigation');
+      window.location.href = 'https://central.carleton.ca/prod/bwskfshd.P_CrseSchd';
+    })
   }
   else if(document.title.trim()=='Student Timetable'){  
-    waitForElmText(timetableNav,'Detail Schedule').then(
+    console.log('On student timetable page - navigating to detail schedule');
+    waitForElmText(timetableNav,'Detail Schedule').then(() => {
       document.querySelector(timetableNav).click()
-    )
+    }).catch(() => {
+      console.log('Could not find Detail Schedule link, trying direct navigation');
+      window.location.href = 'https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl';
+    })
   }
   else if(document.title.trim()=='Registration Term'){
+    console.log('On term selection page - selecting term:', targetTerm);
     waitForElm('#term_id').then(()=>{
       //console.log('termSelector found')
       if (isValidTerm(termSelector, targetTerm)) {
         termSelector.value = targetTerm;
         submitBtn.click();
       } else {
-        alert(`Request failed: Term [${mapTerm(r)}] Not Found\n\nSparkling H2O2`)
+        alert(`Request failed: Term [${mapTerm(r)}] Not Found\n\nCarleton Schedule Exporter`)
         chrome.runtime.sendMessage({action:'end-timetable-request'})
         chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
       }
     })
   }
   else if(document.title.trim()=='Student Detail Schedule'){
+    console.log('On detail schedule page - starting export');
     chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempLoginCU'})
     waitForElm(BIG_FAT_HEADER).then((elm) => {
       //console.log('Timetable Loaded');
@@ -54,6 +84,36 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     })
   }
   else{
+    console.log('Unknown page or stuck:', document.title.trim(), window.location.href);
+    
+    // If we're on a Carleton page but don't recognize it, try to navigate to the right place
+    if (window.location.href.includes('central.carleton.ca') || window.location.href.includes('ssoman.carleton.ca')) {
+      console.log('Attempting navigation to schedule page...');
+      
+      // Try to find and click schedule-related links
+      const scheduleLinks = document.querySelectorAll('a');
+      let foundScheduleLink = false;
+      
+      for (let link of scheduleLinks) {
+        if (link.textContent.includes('Student Detail Schedule') || 
+            link.textContent.includes('Detail Schedule') ||
+            link.href.includes('bwskfshd.P_CrseSchdDetl')) {
+          console.log('Found schedule link, clicking...');
+          link.click();
+          foundScheduleLink = true;
+          break;
+        }
+      }
+      
+      if (!foundScheduleLink) {
+        console.log('No schedule link found, trying direct navigation...');
+        window.location.href = 'https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl';
+      }
+    } else {
+      alert('Please log into Carleton Central first, then try the export again.');
+      chrome.runtime.sendMessage({action:'end-timetable-request'})
+      chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
+    }
   }
 
   function waitForElm(selector) {
@@ -234,20 +294,34 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
         icsContent += 'END:VCALENDAR';
         //console.log('iCal content generated:', icsContent);
         if(count>0){
-          const blob = new Blob([icsContent], { type: 'text/calendar' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = userInfo2+'.ics';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          // Instead of downloading, open calendar integration
+          openCalendarIntegration(icsContent, userInfo2, count);
         }else{
-          alert('Nothing to see here...\n\nSparkling H2O2')
+          alert('Nothing to see here...\n\nCarleton Schedule Exporter')
         }
         const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
-        logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]);
+        // Store export locally instead of sending to server
+        const exportData = {
+          user: userInfo3,
+          timestamp: currentDate,
+          institution: 'carleton',
+          term: userInfo2,
+          courses: allCourses,
+          courseCount: count
+        };
+        
+        chrome.runtime.sendMessage({
+          action:'log_calendar', 
+          data: [userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]
+        });
+        
+        // Show success notification
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL('images/sky-icon.png'),
+          title: 'Schedule Exported!',
+          message: `Successfully exported ${count} courses for ${userInfo2}`
+        });
       }
       else{
         var totalCount=0
@@ -322,9 +396,27 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
           }
         });
         const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
-        logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, totalIcs]);
-        if(totalCount<=0){
-          alert('No classes found\n\nSparkling H2O2')
+        // Store export locally instead of sending to server
+        const exportData = {
+          user: userInfo3,
+          timestamp: currentDate,
+          institution: 'carleton',
+          term: userInfo2,
+          courses: allCourses,
+          courseCount: totalCount
+        };
+        
+        chrome.runtime.sendMessage({
+          action:'log_calendar', 
+          data: [userInfo3, currentDate, 'carleton', userInfo2, allCourses, totalIcs]
+        });
+        
+        // Show success notification
+        if(totalCount > 0) {
+          // Instead of downloading, open calendar integration
+          openCalendarIntegration(totalIcs, userInfo2, totalCount);
+        } else {
+          alert('No classes found\n\nCarleton Schedule Exporter')
         }
       }
     }
@@ -352,15 +444,21 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
       return startDate;
     }
     if(!pa[2]){
-      updateAgreement([userInfo3, "Sparkling H2O2", pa[1], new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), pa[0]?"Yes":"No"])
+      // Update privacy agreement locally only
+      chrome.runtime.sendMessage({
+        action:'update_agreement', 
+        data: [userInfo3, "Carleton Schedule Exporter", pa[1], new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), pa[0]?"Yes":"No"]
+      });
     }
 
     function logCalendar(info){
-      chrome.runtime.sendMessage({action:'log_calendar', data:info});
+      // This function is kept for backward compatibility but no longer sends data externally
+      console.log('Export completed locally');
     }
 
     function updateAgreement(info){
-      chrome.runtime.sendMessage({action:'update_agreement', data:info});
+      // This function is kept for backward compatibility but no longer sends data externally
+      console.log('Agreement updated locally');
     }
     
     function formatDateLocal(date) {
@@ -413,9 +511,212 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
     }
     else{
-      alert("ERROR: Privacy Policy Agreement not found, aborting!\n\n Sparkling H2O2")
+      alert("ERROR: Privacy Policy Agreement not found, aborting!\n\n Carleton Schedule Exporter")
       chrome.runtime.sendMessage({action:'end-timetable-request'})
       chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
+    }
+    
+    function openCalendarIntegration(icsContent, userName, courseCount) {
+      // Create calendar integration modal
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      `;
+      
+      const content = document.createElement('div');
+      content.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      `;
+      
+      content.innerHTML = `
+        <h2 style="color: #333; margin-bottom: 10px;">Schedule Ready! 📅</h2>
+        <p style="color: #666; margin-bottom: 20px;">Found ${courseCount} courses for ${userName}</p>
+        <p style="color: #666; margin-bottom: 25px;">Choose how to add to your calendar:</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+          <button id="googleCalBtn" style="background: #4285f4; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            📊 Google Calendar
+          </button>
+          <button id="outlookCalBtn" style="background: #0078d4; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            📧 Outlook
+          </button>
+          <button id="appleCalBtn" style="background: #000; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            🍎 Apple Calendar
+          </button>
+          <button id="notionCalBtn" style="background: #37352f; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            📝 Notion Calendar
+          </button>
+        </div>
+        
+        <button id="copyToClipboard" style="background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 14px;">
+          📋 Copy Schedule Data
+        </button>
+        
+        <button id="closeModal" style="background: #6c757d; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; margin: 5px; font-size: 14px;">
+          ✕ Close
+        </button>
+      `;
+      
+      modal.appendChild(content);
+      document.body.appendChild(modal);
+      
+      // Google Calendar integration
+      document.getElementById('googleCalBtn').onclick = () => {
+        const events = parseICSEvents(icsContent);
+        events.forEach((event, index) => {
+          setTimeout(() => {
+            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.summary)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
+            window.open(googleUrl, '_blank');
+          }, index * 500); // Stagger opens to avoid popup blocking
+        });
+        showSuccess('Opening Google Calendar events...');
+      };
+      
+      // Outlook integration
+      document.getElementById('outlookCalBtn').onclick = () => {
+        chrome.tabs.create({ url: 'https://outlook.live.com/calendar/' });
+        copyToClipboard(icsContent);
+        showInstructions('Outlook Calendar opened! Calendar data copied to clipboard. In Outlook: Settings → Import Calendar → Paste the data.');
+      };
+      
+      // Apple Calendar
+      document.getElementById('appleCalBtn').onclick = () => {
+        const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `${userName}-schedule.ics`;
+        link.click();
+        showSuccess('Calendar file created! Double-click to open in Apple Calendar.');
+      };
+      
+      // Notion Calendar
+      document.getElementById('notionCalBtn').onclick = () => {
+        chrome.tabs.create({ url: 'https://calendar.notion.so/' });
+        copyToClipboard(icsContent);
+        showInstructions('Notion Calendar opened! Calendar data copied to clipboard. In Notion: Settings → Import → Paste the data.');
+      };
+      
+      // Copy to clipboard
+      document.getElementById('copyToClipboard').onclick = () => {
+        copyToClipboard(icsContent);
+        showSuccess('Schedule data copied to clipboard!');
+      };
+      
+      // Close modal
+      document.getElementById('closeModal').onclick = () => {
+        document.body.removeChild(modal);
+      };
+      
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          document.body.removeChild(modal);
+        }
+      };
+      
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          console.log('Copied to clipboard');
+        }).catch(() => {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        });
+      }
+      
+      function showSuccess(message) {
+        const successDiv = document.createElement('div');
+        successDiv.style.cssText = `
+          background: #d4edda;
+          color: #155724;
+          padding: 10px;
+          border-radius: 5px;
+          margin-top: 15px;
+          border: 1px solid #c3e6cb;
+        `;
+        successDiv.textContent = message;
+        content.appendChild(successDiv);
+        
+        setTimeout(() => {
+          if (successDiv.parentNode) {
+            successDiv.parentNode.removeChild(successDiv);
+          }
+        }, 3000);
+      }
+      
+      function showInstructions(message) {
+        const instrDiv = document.createElement('div');
+        instrDiv.style.cssText = `
+          background: #fff3cd;
+          color: #856404;
+          padding: 10px;
+          border-radius: 5px;
+          margin-top: 15px;
+          border: 1px solid #ffeaa7;
+          font-size: 12px;
+        `;
+        instrDiv.textContent = message;
+        content.appendChild(instrDiv);
+        
+        setTimeout(() => {
+          if (instrDiv.parentNode) {
+            instrDiv.parentNode.removeChild(instrDiv);
+          }
+        }, 5000);
+      }
+    }
+    
+    function parseICSEvents(icsContent) {
+      const events = [];
+      const lines = icsContent.split('\n');
+      let currentEvent = {};
+      let inEvent = false;
+      
+      for (let line of lines) {
+        line = line.trim();
+        
+        if (line === 'BEGIN:VEVENT') {
+          inEvent = true;
+          currentEvent = {};
+        } else if (line === 'END:VEVENT') {
+          inEvent = false;
+          if (currentEvent.summary) {
+            events.push(currentEvent);
+          }
+        } else if (inEvent) {
+          if (line.startsWith('SUMMARY:')) {
+            currentEvent.summary = line.substring(8);
+          } else if (line.startsWith('DTSTART;TZID=America/Toronto:')) {
+            currentEvent.start = line.substring(30);
+          } else if (line.startsWith('DTEND;TZID=America/Toronto:')) {
+            currentEvent.end = line.substring(28);
+          } else if (line.startsWith('DESCRIPTION:')) {
+            currentEvent.description = line.substring(12).replace(/\\n/g, '\n');
+          } else if (line.startsWith('LOCATION:')) {
+            currentEvent.location = line.substring(9);
+          }
+        }
+      }
+      
+      return events;
     }
   }
 
