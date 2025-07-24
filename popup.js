@@ -39,8 +39,8 @@ const policyAgreementCheckbox = document.getElementById('policy-agreement-checkb
 const policyAgreementBtn = document.getElementById('policy-agreement-btn')
 const policyModal = document.querySelector(".privacy-policy-modal")
 
-const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md'
-const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/SPARKLING%20H2O2.md#data-collection'
+const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
+const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
 
 const refresh = {
   'carleton': (e) => refreshTimetable(e),

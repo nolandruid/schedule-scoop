@@ -188,7 +188,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
         //console.log('Creating iCal with timetable:', timetable);
         
         if(exportCombined){
-          let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SparklingH2O2//CU_Timetable//EN\n';
+          let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
           var count=0;
           var allCourses='';
           timetable.forEach(node => {
@@ -254,7 +254,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
           }else{
-            alert('Nothing to see here...\n\nSparkling H2O2')
+            alert('Nothing to see here...\n\nNeuroNest')
           }
           const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
           logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]);
@@ -264,7 +264,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
           var totalIcs = '';
           var allCourses='';
           timetable.forEach(node => {
-            let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SparklingH2O2//Timetable//EN\n';
+            let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
             var count=0;
             //console.log('Processing node:', node);
             node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
@@ -334,7 +334,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
           const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
           logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, totalIcs]);
           if(totalCount<=0){
-            alert('No classes found\n\nSparkling H2O2')
+            alert('No classes found\n\nNeuroNest')
           }
         }
       }
@@ -362,7 +362,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
         return startDate;
       }
       if(!pa[2]){
-        updateAgreement([userInfo3, "Sparkling H2O2", pa[1], new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), pa[0]?"Yes":"No"])
+        updateAgreement([userInfo3, "NeuroNest", pa[1], new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), pa[0]?"Yes":"No"])
       }
 
       function logCalendar(info){
@@ -423,7 +423,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
       chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
     }
     else{
-      alert("ERROR: Privacy Policy Agreement not found, aborting!\n\n Sparkling H2O2")
+      alert("ERROR: Privacy Policy Agreement not found, aborting!\n\n NeuroNest")
       chrome.runtime.sendMessage({action:'end-timetable-request'})
       chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
     }
