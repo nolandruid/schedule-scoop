@@ -16,7 +16,7 @@ A Chrome extension that helps Carleton University students export their course t
 <summary><strong>Phase 1: Code Cleanup & Modernization (4-6 hours)</strong></summary>
 
 ### Modernize JavaScript code (2-3 hours)
-- [ ] **Convert to ES6+ syntax**
+- [S] **Convert to ES6+ syntax**
   <details>
   <summary>Details</summary>
   > **What**: Update carleton-timetables.js to use modern JavaScript features
@@ -24,7 +24,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Replace var with const/let, convert functions to arrow functions, use template literals
   </details>
 
-- [ ] **Use async/await instead of callbacks**
+- [*] **Use async/await instead of callbacks**
   <details>
   <summary>Details</summary>
   > **What**: Replace callback-based code with async/await for better readability
@@ -32,7 +32,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Convert functions that use callbacks to use async/await instead
   </details>
 
-- [ ] **Implement proper error handling**
+- [*] **Implement proper error handling**
   <details>
   <summary>Details</summary>
   > **What**: Add comprehensive error handling throughout the codebase
