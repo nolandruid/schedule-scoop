@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             await removeTab(tab.id);
             //console.log(`removed ${key} tab:`, tab);
           } catch (err) {
-            console.error(err);
+            // Error removing tab
           }
         }
       }
@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     else if (message.action === 'log_calendar') {
-      const calendar_data = {
+      const calendarData = {
         name: message.data[0],
         time: message.data[1],
         institution: message.data[2],
@@ -91,13 +91,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(calendar_data)
+        body: JSON.stringify(calendarData)
       });
     }
 
     else if (message.action === 'update_agreement') {
       //console.log('updating agreement')
-      const agreement_details = {
+      const agreementDetails = {
         name: message.data[0],
         policy: message.data[1],
         agreement_date: message.data[2],
@@ -110,7 +110,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(agreement_details)
+        body: JSON.stringify(agreementDetails)
       });
       const results = await getLocal('privacy_policy_agreement');
       const r = results['privacy_policy_agreement'];
@@ -131,7 +131,7 @@ chrome.webNavigation.onCommitted.addListener((details) => {
       }
       else {
         injectScript(details.tabId, r[2]);
-        console.log('timetable requested, injected script');
+        // Script injection completed
       }
     }
   })();

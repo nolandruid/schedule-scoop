@@ -3,14 +3,14 @@ async function getCarletonAndPrivacyPolicy() {
     try {
       chrome.storage.local.get(['carleton', 'privacy_policy_agreement'], (results) => {
         if (chrome.runtime.lastError) {
-          console.error('Storage error:', chrome.runtime.lastError);
+          // Storage error
           reject(chrome.runtime.lastError);
         } else {
           resolve(results);
         }
       });
     } catch (err) {
-      console.error('Error in getCarletonAndPrivacyPolicy:', err);
+      // Error in getCarletonAndPrivacyPolicy
       reject(err);
     }
   });
@@ -38,7 +38,7 @@ async function getCarletonAndPrivacyPolicy() {
       pa = results['privacy_policy_agreement'];
     }
   } catch (err) {
-    console.error('Error processing results:', err);
+    // Error processing results
     alert('Error processing settings.\n\nNeuroNest');
     chrome.runtime.sendMessage({action:'end-timetable-request'});
     chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
@@ -46,7 +46,7 @@ async function getCarletonAndPrivacyPolicy() {
   }
 
   const termSelector = document.getElementById('term_id');
-  const BIG_FAT_HEADER = 'body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2';
+  const bigFatHeader = 'body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2';
   const timetableNav = 'body > div.footerlinksdiv > span > map > p:nth-child(2) > a:nth-child(2)';
   const calendarNav = 'body > div.pagebodydiv > table.menuplaintable > tbody > tr:nth-child(3) > td:nth-child(2) > span > ul > li:nth-child(1) > a:nth-child(4)';
   const targetTerm = r[1] + r[0];
@@ -68,12 +68,12 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             document.querySelector(calendarNav).click();
           } catch (err) {
-            console.error('Error clicking calendarNav:', err);
+            // Error clicking calendarNav
             alert('Navigation error.\n\nNeuroNest');
           }
         }
       ).catch(err => {
-        console.error('waitForElmText error:', err);
+        // waitForElmText error
         alert('Failed to find Student Timetable link.\n\nNeuroNest');
       });
     }
@@ -84,12 +84,12 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             document.querySelector(timetableNav).click();
           } catch (err) {
-            console.error('Error clicking timetableNav:', err);
+            // Error clicking timetableNav
             alert('Navigation error.\n\nNeuroNest');
           }
         }
       ).catch(err => {
-        console.error('waitForElmText error:', err);
+        // waitForElmText error
         alert('Failed to find Detail Schedule link.\n\nNeuroNest');
       });
     }
@@ -105,13 +105,13 @@ async function getCarletonAndPrivacyPolicy() {
             chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
           }
         } catch (err) {
-          console.error('Error in Registration Term:', err);
+          // Error in Registration Term
           alert('Error selecting term.\n\nNeuroNest');
           chrome.runtime.sendMessage({action:'end-timetable-request'});
           chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
         }
       }).catch(err => {
-        console.error('waitForElm error:', err);
+        // waitForElm error
         alert('Failed to find term selector.\n\nNeuroNest');
         chrome.runtime.sendMessage({action:'end-timetable-request'});
         chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
@@ -119,17 +119,17 @@ async function getCarletonAndPrivacyPolicy() {
     }
     else if (document.title.trim() == 'Student Detail Schedule') {
       chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempLoginCU'});
-      waitForElm(BIG_FAT_HEADER).then((elm) => {
+      waitForElm(bigFatHeader).then((elm) => {
         try {
           run();
         } catch (err) {
-          console.error('Error running timetable extraction:', err);
+          // Error running timetable extraction
           alert('Failed to process timetable.\n\nNeuroNest');
           chrome.runtime.sendMessage({action:'end-timetable-request'});
           chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
         }
       }).catch(err => {
-        console.error('waitForElm error:', err);
+        // waitForElm error
         alert('Failed to find timetable header.\n\nNeuroNest');
         chrome.runtime.sendMessage({action:'end-timetable-request'});
         chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
@@ -139,7 +139,7 @@ async function getCarletonAndPrivacyPolicy() {
       // chrome.runtime.sendMessage({action:'timetable1', node:'carleton', case:'sign-in', tab:tab[0], script:'armory/carleton-timetable.js'})
     }
   } catch (err) {
-    console.error('Unhandled error in main navigation:', err);
+    // Unhandled error in main navigation
     alert('Unexpected error occurred.\n\nNeuroNest');
     chrome.runtime.sendMessage({action:'end-timetable-request'});
     chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
@@ -169,7 +169,7 @@ async function getCarletonAndPrivacyPolicy() {
           reject(new Error('Timeout waiting for element: ' + selector));
         }, 10000);
       } catch (err) {
-        console.error('waitForElm error:', err);
+        // waitForElm error
         reject(err);
       }
     });
@@ -187,7 +187,7 @@ async function getCarletonAndPrivacyPolicy() {
       }
       throw new Error('Timeout waiting for element text');
     } catch (err) {
-      console.error('waitForElmText error:', err);
+      // waitForElmText error
       throw err;
     }
   }
@@ -202,7 +202,7 @@ async function getCarletonAndPrivacyPolicy() {
       }
       return false;
     } catch (err) {
-      console.error('isValidTerm error:', err);
+      // isValidTerm error
       return false;
     }
   }
@@ -218,7 +218,7 @@ async function getCarletonAndPrivacyPolicy() {
           userInfo2 = staticHeadersDiv ? staticHeadersDiv.innerHTML.split('<br>')[1].trim().split(' ').slice(0, 2).join(' ') : 'Nameless';
           userInfo3 = staticHeadersDiv ? staticHeadersDiv.innerHTML.split('<br>')[0].trim().split(' ').slice(1).join(' ') : 'Unknown User';
         } catch (err) {
-          console.error('Error extracting user info:', err);
+          // Error extracting user info
           userInfo2 = 'Nameless';
           userInfo3 = 'Unknown User';
         }
@@ -271,7 +271,7 @@ async function getCarletonAndPrivacyPolicy() {
               log.push(meta);
             }
           } catch (err) {
-            console.error('Error parsing table:', err);
+            // Error parsing table
           }
         });
 
@@ -282,7 +282,7 @@ async function getCarletonAndPrivacyPolicy() {
             const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
             return !(row == '') ? row.textContent.trim() : 'N/A';
           } catch (err) {
-            console.error('getRowContent error:', err);
+            // getRowContent error
             return 'N/A';
           }
         }
@@ -327,12 +327,12 @@ async function getCarletonAndPrivacyPolicy() {
                     icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
                     icsContent += `LOCATION:${node.location}\n`;
                     icsContent += 'END:VEVENT\n';
-                    count++;
-                  }
-                } catch (err) {
-                  console.error('Error creating iCal event:', err);
+                                      count++;
                 }
-              });
+              } catch (err) {
+                // Error creating iCal event
+              }
+            });
               icsContent += 'END:VCALENDAR';
               if (count > 0) {
                 try {
@@ -346,7 +346,7 @@ async function getCarletonAndPrivacyPolicy() {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
                 } catch (err) {
-                  console.error('Error downloading iCal:', err);
+                  // Error downloading iCal
                   alert('Failed to download calendar file.\n\nNeuroNest');
                 }
               } else {
@@ -411,12 +411,12 @@ async function getCarletonAndPrivacyPolicy() {
                       document.body.removeChild(a);
                       URL.revokeObjectURL(url);
                     } catch (err) {
-                      console.error('Error downloading iCal:', err);
+                      // Error downloading iCal
                       alert('Failed to download calendar file.\n\nNeuroNest');
                     }
                   }
                 } catch (err) {
-                  console.error('Error creating iCal event:', err);
+                  // Error creating iCal event
                 }
               });
               const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
@@ -426,7 +426,7 @@ async function getCarletonAndPrivacyPolicy() {
               }
             }
           } catch (err) {
-            console.error('createICal error:', err);
+            // createICal error
             alert('Failed to generate calendar file.\n\nNeuroNest');
           }
         }
@@ -441,7 +441,7 @@ async function getCarletonAndPrivacyPolicy() {
             startDate.setDate(startDate.getDate() + diff);
             return startDate;
           } catch (err) {
-            console.error('adjustStartDateToDay error:', err);
+            // adjustStartDateToDay error
             return startDate;
           }
         }
@@ -456,7 +456,7 @@ async function getCarletonAndPrivacyPolicy() {
               `${pa[0] ? "Yes" : "No"}`
             ]);
           } catch (err) {
-            console.error('updateAgreement error:', err);
+            // updateAgreement error
           }
         }
 
@@ -464,7 +464,7 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             chrome.runtime.sendMessage({ action: 'log_calendar', data: info });
           } catch (err) {
-            console.error('logCalendar error:', err);
+            // logCalendar error
           }
         }
 
@@ -472,7 +472,7 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             chrome.runtime.sendMessage({ action: 'update_agreement', data: info });
           } catch (err) {
-            console.error('updateAgreement error:', err);
+            // updateAgreement error
           }
         }
 
@@ -480,7 +480,7 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0];
           } catch (err) {
-            console.error('formatDateLocal error:', err);
+            // formatDateLocal error
             return '';
           }
         }
@@ -489,7 +489,7 @@ async function getCarletonAndPrivacyPolicy() {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
           } catch (err) {
-            console.error('formatDateUTC error:', err);
+            // formatDateUTC error
             return '';
           }
         }
@@ -502,7 +502,7 @@ async function getCarletonAndPrivacyPolicy() {
             if (modifier === 'pm') hours = parseInt(hours, 10) + 12;
             return `${hours}:${minutes}`;
           } catch (err) {
-            console.error('convertTo24Hour error:', err);
+            // convertTo24Hour error
             return '00:00';
           }
         };
@@ -516,7 +516,7 @@ async function getCarletonAndPrivacyPolicy() {
         chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
       }
     } catch (err) {
-      console.error('run() error:', err);
+      // run() error
       alert('Unexpected error during timetable processing.\n\nNeuroNest');
       chrome.runtime.sendMessage({ action: 'end-timetable-request' });
       chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
@@ -537,12 +537,12 @@ async function getCarletonAndPrivacyPolicy() {
           sem = 'Winter';
           break;
         default:
-          console.error('Invalid semester code:', term[0]);
+          // Invalid semester code
           return;
       }
       return `${sem} ${term[1]}`;
     } catch (err) {
-      console.error('mapTerm error:', err);
+      // mapTerm error
       return '';
     }
   }
@@ -564,11 +564,11 @@ async function getCarletonAndPrivacyPolicy() {
         year = String(Number(year) + 1);
       } else {
         term = '10';
-        console.error(`ERROR: month not found. Default term is set to: ${term} ${year}`);
+        // Month not found
       }
       return [term, year, true];
     } catch (err) {
-      console.error('getDefaultTerm error:', err);
+      // getDefaultTerm error
       return ['10', String(new Date().getFullYear()), true];
     }
   }

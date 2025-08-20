@@ -18,6 +18,7 @@ A Chrome extension that helps Carleton University students export their course t
 ### Modernize JavaScript code (2-3 hours)
 - [S] **Convert to ES6+ syntax**
   <details>
+  # Could not convert functions into arrow functions
   <summary>Details</summary>
   > **What**: Update carleton-timetables.js to use modern JavaScript features
   > **Why**: Makes code more readable and maintainable
@@ -41,7 +42,7 @@ A Chrome extension that helps Carleton University students export their course t
   </details>
 
 ### Clean up code structure (2-3 hours)
-- [ ] **Remove all console.log statements**
+- [*] **Remove all console.log statements**
   <details>
   <summary>Details</summary>
   > **What**: Remove all debug console.log, console.error, and console.warn statements
@@ -57,7 +58,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Add /** */ comments above each function describing parameters, return values, and purpose
   </details>
 
-- [ ] **Implement consistent naming conventions**
+- [*] **Implement consistent naming conventions**
   <details>
   <summary>Details</summary>
   > **What**: Ensure all variables, functions, and files follow consistent naming patterns

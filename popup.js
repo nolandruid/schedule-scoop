@@ -199,14 +199,14 @@ function injectScript(tabId, file) {
   });
 }
 
-function open(request_url){
-  if(request_url){
-    chrome.tabs.query({'url':request_url}, tabs => {
+function open(requestUrl){
+  if(requestUrl){
+    chrome.tabs.query({'url':requestUrl}, tabs => {
       if(tabs.length>0){
         chrome.tabs.update(tabs[tabs.length-1].id, {active: true})
       }
       else{
-        chrome.tabs.create({url: request_url})
+        chrome.tabs.create({url: requestUrl})
       }
     })
   }
@@ -271,7 +271,7 @@ function setTimetableState(school, term) {
       sem = 'Winter';
       break;
     default:
-      console.error('Invalid semester code:', term[0]);
+      // Invalid semester code
       return;
   }
 
@@ -280,7 +280,7 @@ function setTimetableState(school, term) {
   if (targetState) {
     targetState.textContent = `${sem} ${term[1]}`;
   } else {
-    console.error('Node state label not found for school:', school);
+    // Node state label not found
   }
 }
 
@@ -317,7 +317,7 @@ function getDefaultTerm() {
     year = String(Number(year) + 1);
   } else {
     term = '10';
-    console.error("ERROR: month not found. Default term is set to:", term, year, true);
+    // Month not found
   }
 
   //console.log("Default term is set to:", [term, year, false]);
@@ -332,7 +332,7 @@ function closeTimetable(){
 function setLocal(key, val){
   chrome.storage.local.get(key, (result)=> {
     if (chrome.runtime.lastError) {
-        console.error("Error retrieving key:", key, chrome.runtime.lastError);
+        // Error retrieving key
         return;
     }
     const original = result[key]; // Retrieve the current value
@@ -345,7 +345,7 @@ function setLocal(key, val){
       //console.log("About to save - ", original, " ==> ", val);
       chrome.storage.local.set({ [key]: val }, function() {
         if (chrome.runtime.lastError) {
-          console.error("Error saving value:", key, chrome.runtime.lastError);
+          // Error saving value
         }
         else{
           //console.log("Value saved successfully for", key, ":", val);
