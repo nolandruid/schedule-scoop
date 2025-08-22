@@ -42,25 +42,38 @@ const removeTab = (tabId) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
+    if (!message || typeof message !== 'object' || typeof message.action !== 'string') {
+      return;
+    }
+
     if (message.action === 'newCarletonTempTab') {
-      let key = message.type === 'login' ? 'tempLoginCU' : 'tempTimetableCU';
-      const tab = await createTab({ url: message.login });
+      const isLogin = message && message.type === 'login';
+      const loginUrl = message && typeof message.login === 'string' ? message.login : undefined;
+      if (!loginUrl) {
+        return;
+      }
+      let key = isLogin ? 'tempLoginCU' : 'tempTimetableCU';
+      const tab = await createTab({ url: loginUrl });
       const result = await getSession(key);
       const temp = result[key] ? result[key] : [];
-      temp.push(tab);
+      if (tab && typeof tab.id === 'number') {
+        temp.push(tab);
+      }
       await setSession({ [key]: temp });
       //console.log(`Tracking new, ${key} tab:`, tab, `.\nTotal:`, temp);
     }
 
     else if (message.action === 'closeTempTabs') {
-      let key = message.type === 'tempLoginCU' ? 'tempLoginCU' : 'tempTimetableCU';
+      let key = message && message.type === 'tempLoginCU' ? 'tempLoginCU' : 'tempTimetableCU';
       const result = await getSession(key);
       let tabs = result[key];
       //console.log(`About to close temp:`, tabs);
-      if (tabs && tabs.length > 0) {
+      if (Array.isArray(tabs) && tabs.length > 0) {
         for (const tab of tabs) {
           try {
-            await removeTab(tab.id);
+            if (tab && typeof tab.id === 'number') {
+              await removeTab(tab.id);
+            }
             //console.log(`removed ${key} tab:`, tab);
           } catch (err) {
             // Error removing tab
@@ -77,45 +90,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     else if (message.action === 'log_calendar') {
+      const arr = Array.isArray(message.data) ? message.data : [];
+      if (arr.length < 6) {
+        return;
+      }
       const calendarData = {
-        name: message.data[0],
-        time: message.data[1],
-        institution: message.data[2],
-        term: message.data[3],
-        info: message.data[4],
-        calendar: message.data[5]
+        name: typeof arr[0] === 'string' ? arr[0] : '',
+        time: typeof arr[1] === 'string' ? arr[1] : '',
+        institution: typeof arr[2] === 'string' ? arr[2] : '',
+        term: typeof arr[3] === 'string' ? arr[3] : '',
+        info: typeof arr[4] === 'string' ? arr[4] : '',
+        calendar: typeof arr[5] === 'string' ? arr[5] : ''
       };
-      // Send the data as a JSON object to the PHP server
-      fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(calendarData)
-      });
+      try {
+        // Send the data as a JSON object to the PHP server
+        await fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(calendarData)
+        });
+      } catch (e) {
+        // network error ignored
+      }
     }
 
     else if (message.action === 'update_agreement') {
       //console.log('updating agreement')
+      const arr = Array.isArray(message.data) ? message.data : [];
+      if (arr.length < 5) {
+        return;
+      }
       const agreementDetails = {
-        name: message.data[0],
-        policy: message.data[1],
-        agreement_date: message.data[2],
-        recorded_date: message.data[3],
-        agreed: message.data[4]
+        name: typeof arr[0] === 'string' ? arr[0] : '',
+        policy: typeof arr[1] === 'string' ? arr[1] : '',
+        agreement_date: typeof arr[2] === 'string' ? arr[2] : '',
+        recorded_date: typeof arr[3] === 'string' ? arr[3] : '',
+        agreed: String(arr[4])
       };
-      // Send the data as a JSON object to the PHP server
-      await fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_policy.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(agreementDetails)
-      });
+      try {
+        // Send the data as a JSON object to the PHP server
+        await fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_policy.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(agreementDetails)
+        });
+      } catch (e) {
+        // network error ignored
+      }
       const results = await getLocal('privacy_policy_agreement');
       const r = results['privacy_policy_agreement'];
-      r[2] = true;
-      await setLocal({ ['privacy_policy_agreement']: r });
+      if (Array.isArray(r)) {
+        r[2] = true;
+        await setLocal({ ['privacy_policy_agreement']: r });
+      }
       //console.log('updated agreement')
     }
   })();

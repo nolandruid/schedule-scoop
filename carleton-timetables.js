@@ -30,12 +30,12 @@ async function getCarletonAndPrivacyPolicy() {
   let r;
   let pa;
   try {
-    if (!results) {
+    if (!results || typeof results !== 'object') {
       r = getDefaultTerm();
       alert(`No default term found; Using: ${r}`);
     } else {
-      r = results['carleton'];
-      pa = results['privacy_policy_agreement'];
+      r = Array.isArray(results['carleton']) ? results['carleton'] : getDefaultTerm();
+      pa = Array.isArray(results['privacy_policy_agreement']) ? results['privacy_policy_agreement'] : undefined;
     }
   } catch (err) {
     // Error processing results
@@ -49,8 +49,8 @@ async function getCarletonAndPrivacyPolicy() {
   const bigFatHeader = 'body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2';
   const timetableNav = 'body > div.footerlinksdiv > span > map > p:nth-child(2) > a:nth-child(2)';
   const calendarNav = 'body > div.pagebodydiv > table.menuplaintable > tbody > tr:nth-child(3) > td:nth-child(2) > span > ul > li:nth-child(1) > a:nth-child(4)';
-  const targetTerm = r[1] + r[0];
-  const exportCombined = r[2];
+  const targetTerm = String(r[1]) + String(r[0]);
+  const exportCombined = !!r[2];
   const submitBtn = document.querySelector('input[type=submit]');
   const tableElement = 'table.datadisplaytable[summary="This table lists the scheduled meeting times and assigned instructors for this class.."]';
 
@@ -96,7 +96,7 @@ async function getCarletonAndPrivacyPolicy() {
     else if (document.title.trim() == 'Registration Term') {
       waitForElm('#term_id').then(() => {
         try {
-          if (isValidTerm(termSelector, targetTerm)) {
+          if (termSelector && isValidTerm(termSelector, targetTerm)) {
             termSelector.value = targetTerm;
             submitBtn.click();
           } else {
@@ -239,8 +239,8 @@ async function getCarletonAndPrivacyPolicy() {
                 }
               });
               let courseData = table.querySelector('a').textContent.trim().split(' - ').reverse();
-              let courseCode = courseData[1];
-              let courseSection = courseData[0];
+              let courseCode = courseData[1] || '';
+              let courseSection = courseData[0] || '';
               let courseName = courseData.slice(2).join(' - ');
               let crn = getRowContent(table, 3);
               let instructor = getRowContent(table, 5);
@@ -255,17 +255,23 @@ async function getCarletonAndPrivacyPolicy() {
               const row = table.querySelector('tr:nth-of-type(2)');
               if (!row) throw new Error('Missing row in table');
               const cells = row.querySelectorAll('td');
-              section.classStartTime = cells[1].textContent.trim() == 'TBA' ? 'N/A' : cells[1].textContent.trim().split(' - ')[0];
-              section.classEndTime = cells[1].textContent.trim() == 'TBA' ? 'N/A' : cells[1].textContent.trim().split(' - ')[1];
-              section.daysOfTheWeek = cells[2].textContent.trim();
-              section.location = cells[3].textContent.trim() == 'TBA' ? '' : cells[3].textContent.trim();
-              section.startDate = new Date(cells[4].textContent.trim().split(' - ')[0]);
-              section.endDate = new Date(cells[4].textContent.trim().split(' - ')[1]);
-              Object.assign(tables[Math.floor(index / 2)], section);
+              const timeCell = cells[1] ? cells[1].textContent.trim() : '';
+              section.classStartTime = timeCell == 'TBA' ? 'N/A' : (timeCell.split(' - ')[0] || 'N/A');
+              section.classEndTime = timeCell == 'TBA' ? 'N/A' : (timeCell.split(' - ')[1] || 'N/A');
+              section.daysOfTheWeek = cells[2] ? cells[2].textContent.trim() : '';
+              const loc = cells[3] ? cells[3].textContent.trim() : '';
+              section.location = loc == 'TBA' ? '' : loc;
+              const dateCell = cells[4] ? cells[4].textContent.trim() : '';
+              const dateParts = dateCell.split(' - ');
+              section.startDate = new Date(dateParts[0] || Date.now());
+              section.endDate = new Date(dateParts[1] || Date.now());
+              const targetIndex = Math.floor(index / 2);
+              if (!tables[targetIndex]) tables[targetIndex] = {};
+              Object.assign(tables[targetIndex], section);
 
               table.querySelectorAll('th').forEach((r, o) => {
                 let header = r.textContent.trim();
-                let value = cells[o].textContent.trim();
+                let value = cells[o] ? cells[o].textContent.trim() : '';
                 meta[header] = value;
               });
               log.push(meta);
@@ -289,12 +295,17 @@ async function getCarletonAndPrivacyPolicy() {
 
         function createICal(timetable) {
           try {
+            if (!Array.isArray(timetable) || timetable.length === 0) {
+              alert('No timetable data to export.\n\nNeuroNest');
+              return;
+            }
             if (exportCombined) {
               let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
               let count = 0;
               let allCourses = '';
               timetable.forEach(node => {
                 try {
+                  if (!node || !node.daysOfTheWeek) return;
                   node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
                   const startTime = node.classStartTime == 'N/A' ? 'none' : convertTo24Hour(node.classStartTime).split(':');
@@ -310,7 +321,7 @@ async function getCarletonAndPrivacyPolicy() {
                     const dayOfWeek = daysMap[day];
                     dayList.push(dayOfWeek);
                   });
-                  if (dayList && startTime != 'none') {
+                  if (dayList.length > 0 && startTime != 'none') {
                     const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                     const startDate = new Date(node.startDate);
                     const endDate = new Date(node.startDate);
@@ -362,6 +373,7 @@ async function getCarletonAndPrivacyPolicy() {
                 try {
                   let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
                   let count = 0;
+                  if (!node || !node.daysOfTheWeek) return;
                   node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
                   const startTime = node.classStartTime == 'N/A' ? 'none' : convertTo24Hour(node.classStartTime).split(':');
@@ -377,7 +389,7 @@ async function getCarletonAndPrivacyPolicy() {
                     const dayOfWeek = daysMap[day];
                     dayList.push(dayOfWeek);
                   });
-                  if (dayList && startTime != 'none') {
+                  if (dayList.length > 0 && startTime != 'none') {
                     const startDate = new Date(node.startDate);
                     const endDate = new Date(node.startDate);
                     const untilDate = new Date(node.endDate);
@@ -434,6 +446,7 @@ async function getCarletonAndPrivacyPolicy() {
         function adjustStartDateToDay(startDate, daysOfTheWeek) {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
+            if (!daysOfTheWeek || daysOfTheWeek.length === 0) return startDate;
             const dayOfWeek = daysMap[daysOfTheWeek[0]];
             const currentDay = startDate.getDay();
             let diff = dayOfWeek - currentDay;

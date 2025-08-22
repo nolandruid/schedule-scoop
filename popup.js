@@ -58,139 +58,210 @@ const policy = {
 }
 
 // click listener & menu toggle - nodes
-nodes.forEach(node => {
-  node.addEventListener("click", (e)=>{
-    const nodeParent = e.target.closest("li");
-    //clog(selectionParent)
-    nodeParent.classList.toggle("showMenu")
+if (nodes && nodes.forEach) {
+  nodes.forEach(node => {
+    if (node && node.addEventListener) {
+      node.addEventListener("click", (e)=>{
+        const nodeParent = e.target && e.target.closest ? e.target.closest("li") : null;
+        if (nodeParent) {
+          nodeParent.classList.toggle("showMenu")
+        }
+      })
+    }
   })
-})
+}
 
 // click listener & open options page
-staticNodes.forEach(node => {
-  node.addEventListener("click", (e)=>{
-    chrome.runtime.openOptionsPage()
+if (staticNodes && staticNodes.forEach) {
+  staticNodes.forEach(node => {
+    if (node && node.addEventListener) {
+      node.addEventListener("click", (e)=>{
+        if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
+          chrome.runtime.openOptionsPage()
+        }
+      })
+    }
   })
-})
+}
 
 // click listener - selectors
-nodeSelectors.forEach(selector =>{
-  selector.addEventListener("click", (e)=>{
-    // Check if the click event originated from a config-btn
-    if (e.target.closest(".config-btn")) {
-      // If so, stop the event from propagating to the parent
-      e.stopPropagation();
-      return;
+if (nodeSelectors && nodeSelectors.forEach) {
+  nodeSelectors.forEach(selector =>{
+    if (selector && selector.addEventListener) {
+      selector.addEventListener("click", (e)=>{
+        if (!e) return;
+        // Check if the click event originated from a config-btn
+        if (e.target && e.target.closest && e.target.closest(".config-btn")) {
+          e.stopPropagation();
+          return;
+        }
+        if (e.preventDefault) e.preventDefault();
+        const schoolKey = selector.dataset ? selector.dataset.school : undefined;
+        if (schoolKey && loader && typeof loader[schoolKey] === 'function') {
+          loader[schoolKey](selector)
+        }
+      })
     }
-    e.preventDefault
-    loader[selector.dataset.school](selector)
   })
-})
+}
 
-saveBtns.forEach(b=>{
-  b.addEventListener('click',()=>{
-    saveTimetable()
+if (saveBtns && saveBtns.forEach) {
+  saveBtns.forEach(b=>{
+    if (b && b.addEventListener) {
+      b.addEventListener('click',()=>{
+        saveTimetable()
+      })
+    }
   })
-})
+}
 
-resetBtns.forEach(b=>{
-  b.addEventListener('click',()=>{
-    resetTimetable()
+if (resetBtns && resetBtns.forEach) {
+  resetBtns.forEach(b=>{
+    if (b && b.addEventListener) {
+      b.addEventListener('click',()=>{
+        resetTimetable()
+      })
+    }
   })
-})
+}
 
-presetBtns.forEach(e=>{
-  e.addEventListener('click',()=>{
-    refreshTimetable()
+if (presetBtns && presetBtns.forEach) {
+  presetBtns.forEach(e=>{
+    if (e && e.addEventListener) {
+      e.addEventListener('click',()=>{
+        refreshTimetable()
+      })
+    }
   })
-})
+}
 
-closeBtns.forEach(e=>{
-  e.addEventListener('click',()=>{
-    closeTimetable()
+if (closeBtns && closeBtns.forEach) {
+  closeBtns.forEach(e=>{
+    if (e && e.addEventListener) {
+      e.addEventListener('click',()=>{
+        closeTimetable()
+      })
+    }
   })
-})
+}
 
-configBtns.forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    showTimetable(btn)
-  });
-});
-
-policyBtns.forEach(b=>{
-  b.addEventListener('click',e=>{
-    policy[b.dataset.node]()
-    // console.log("clicked",b.dataset.node)
-  })
-})
-
-nodeLists.forEach(b=>{
-  b.addEventListener('mousedown', (e) => {
-    if (!e.target.closest('.config-btn')) {
-      e.preventDefault()
-      b.classList.add('force-active');
+if (configBtns && configBtns.forEach) {
+  configBtns.forEach(btn => {
+    if (btn && btn.addEventListener) {
+      btn.addEventListener("click", (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        showTimetable(btn)
+      });
     }
   });
-  b.addEventListener('mouseup', () => {
-    b.classList.remove('force-active');
-  });
-  b.addEventListener('mouseleave', () => {
-    b.classList.remove('force-active');
-  });
-})
+}
 
-policyAgreementCheckbox.addEventListener('change',()=>{
-  if(policyAgreementCheckbox.checked){
-    policyAgreementBtn.disabled = false;
-  }
-  else{
-    policyAgreementBtn.disabled = true;
-  }
-})
-
-policyAgreementBtn.addEventListener('click',e=>{
-  e.preventDefault()
-  if(policyAgreementCheckbox.checked){
-    setLocal("privacy_policy_agreement", [policyAgreementCheckbox.checked, new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), false]);
-    screen1.classList.add('hidden')
-    policyModal.classList.add('hidden');
-  }
-})
-
-infoBtns.forEach(btn=>{
-  btn.addEventListener('click',e=>{
-    e.preventDefault()
-    e.stopPropagation()
-    notify(btn.dataset.info)
+if (policyBtns && policyBtns.forEach) {
+  policyBtns.forEach(b=>{
+    if (b && b.addEventListener) {
+      b.addEventListener('click',e=>{
+        const node = b && b.dataset ? b.dataset.node : undefined;
+        if (node && policy && typeof policy[node] === 'function') {
+          policy[node]()
+        }
+      })
+    }
   })
-})
+}
 
-dropdownConfigSelectors.forEach(e=>{
-  e.addEventListener('change',()=>{
-    refreshTimetable(e.value)
+if (nodeLists && nodeLists.forEach) {
+  nodeLists.forEach(b=>{
+    if (!b || !b.addEventListener) return;
+    b.addEventListener('mousedown', (e) => {
+      if (e && e.target && e.target.closest && !e.target.closest('.config-btn')) {
+        if (e.preventDefault) e.preventDefault()
+        b.classList.add('force-active');
+      }
+    });
+    b.addEventListener('mouseup', () => {
+      b.classList.remove('force-active');
+    });
+    b.addEventListener('mouseleave', () => {
+      b.classList.remove('force-active');
+    });
   })
-})
+}
+
+if (policyAgreementCheckbox && policyAgreementCheckbox.addEventListener) {
+  policyAgreementCheckbox.addEventListener('change',()=>{
+    if(policyAgreementCheckbox.checked){
+      if (policyAgreementBtn) policyAgreementBtn.disabled = false;
+    }
+    else{
+      if (policyAgreementBtn) policyAgreementBtn.disabled = true;
+    }
+  })
+}
+
+if (policyAgreementBtn && policyAgreementBtn.addEventListener) {
+  policyAgreementBtn.addEventListener('click',e=>{
+    if (e && e.preventDefault) e.preventDefault()
+    if(policyAgreementCheckbox && policyAgreementCheckbox.checked){
+      setLocal("privacy_policy_agreement", [true, new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), false]);
+      if (screen1) screen1.classList.add('hidden')
+      if (policyModal) policyModal.classList.add('hidden');
+    }
+  })
+}
+
+if (infoBtns && infoBtns.forEach) {
+  infoBtns.forEach(btn=>{
+    if (btn && btn.addEventListener) {
+      btn.addEventListener('click',e=>{
+        if (e && e.preventDefault) e.preventDefault()
+        if (e && e.stopPropagation) e.stopPropagation()
+        const info = btn && btn.dataset ? btn.dataset.info : '';
+        if (typeof info === 'string') {
+          notify(info)
+        }
+      })
+    }
+  })
+}
+
+if (dropdownConfigSelectors && dropdownConfigSelectors.forEach) {
+  dropdownConfigSelectors.forEach(e=>{
+    if (e && e.addEventListener) {
+      e.addEventListener('change',()=>{
+        refreshTimetable(e.value)
+      })
+    }
+  })
+}
 
 // Close the overlay when clicking outside of it
-darkScreen.addEventListener("click", () => {
-  hideOverlays()
-});
+if (darkScreen && darkScreen.addEventListener) {
+  darkScreen.addEventListener("click", () => {
+    hideOverlays()
+  });
+}
 
-ok.addEventListener('click',()=>{
-  hideBanner()
-})
+if (ok && ok.addEventListener) {
+  ok.addEventListener('click',()=>{
+    hideBanner()
+  })
+}
 
-screen1.addEventListener("click", (e) => {
-  e.preventDefault()
-  e.stopPropagation()
-});
+if (screen1 && screen1.addEventListener) {
+  screen1.addEventListener("click", (e) => {
+    if (e && e.preventDefault) e.preventDefault()
+    if (e && e.stopPropagation) e.stopPropagation()
+  });
+}
 
 // listener - open updates.html when clicked
-showUpdates.addEventListener('click',(e)=>{
-  open(showUpdates.dataset.url)
-  window.close()
-})
+if (showUpdates && showUpdates.addEventListener) {
+  showUpdates.addEventListener('click',(e)=>{
+    const url = showUpdates && showUpdates.dataset ? showUpdates.dataset.url : undefined;
+    open(url)
+    if (window && typeof window.close === 'function') window.close()
+  })
+}
 
 function injectScript(tabId, file) {
   chrome.scripting.executeScript({
@@ -217,6 +288,9 @@ function loaderCarleton(node){
 }
 
 function injectCarleton(file, login, timetables){
+  if (typeof timetables !== 'string' || typeof file !== 'string' || typeof login !== 'string') {
+    return;
+  }
   chrome.tabs.query({ active: true, url: timetables },tab=>{
     if(tab.length>0){
       chrome.storage.session.set({['timetable-requested']:[true,'carleton', file]}, ()=>{
@@ -239,18 +313,21 @@ function showTimetable(btn){
 }
 
 function saveTimetable(school=schoolSelect.value, semester=semesterSelect.value, year=yearSelect.value, combined=exportMode.checked){
-  setLocal(school, [semester, year, combined])
+  if (!school) return;
+  const safeCombined = !!combined;
+  setLocal(school, [semester, year, safeCombined])
   hideOverlays()
 }
 
 function refreshTimetable(key){
+  if (!key) { return; }
   chrome.storage.local.get([key], (result) => {
     const termData = result[key];
     if (termData) {
-      semesterSelect.value = termData[0];
-      yearSelect.value = termData[1];
-      exportMode.checked = termData[2]==undefined?true:termData[2]
-      setTimetableState(key, [semesterSelect.value, yearSelect.value])
+      if (semesterSelect) semesterSelect.value = termData[0];
+      if (yearSelect) yearSelect.value = termData[1];
+      if (exportMode) exportMode.checked = termData[2]==undefined?true:!!termData[2]
+      setTimetableState(key, [semesterSelect ? semesterSelect.value : termData[0], yearSelect ? yearSelect.value : termData[1]])
     } else {
       setTimetableState(key, resetTimetable());
       saveTimetable()
@@ -259,6 +336,7 @@ function refreshTimetable(key){
 }
 
 function setTimetableState(school, term) {
+  if (!Array.isArray(term) || term.length < 2) return;
   let sem;
   switch (term[0]) {
     case '30':
@@ -287,9 +365,9 @@ function setTimetableState(school, term) {
 function resetTimetable(){
   const defaultTerm = getDefaultTerm();
   //console.log('Using default term:', defaultTerm);
-  semesterSelect.value = defaultTerm[0];
-  yearSelect.value = defaultTerm[1];
-  exportMode.checked = defaultTerm[2]==undefined?true:defaultTerm[2]
+  if (semesterSelect) semesterSelect.value = defaultTerm[0];
+  if (yearSelect) yearSelect.value = defaultTerm[1];
+  if (exportMode) exportMode.checked = defaultTerm[2]==undefined?true:!!defaultTerm[2]
   //console.log('New term:', [semesterSelect.value, yearSelect.value, findTimetable.checked]);
   return defaultTerm
 }
@@ -335,7 +413,7 @@ function setLocal(key, val){
         // Error retrieving key
         return;
     }
-    const original = result[key]; // Retrieve the current value
+    const original = result ? result[key] : undefined; // Retrieve the current value
     if(Array.isArray(original)&&Array.isArray(val)){
       var  eq=arraysEqual(original,val)
     }else{
@@ -351,7 +429,9 @@ function setLocal(key, val){
           //console.log("Value saved successfully for", key, ":", val);
         }
         try{
-          refresh[key](key)
+          if (refresh && typeof refresh[key] === 'function') {
+            refresh[key](key)
+          }
         }
         catch(error){
           // console.error(`REFRESH ERROR FOR KEY ${key}:\n${error}`)
@@ -372,6 +452,7 @@ function arraysEqual(arr1, arr2) {
 }
 
 function notify(warning){
+  if (typeof warning !== 'string') return;
   bannerOverlay.querySelectorAll('.banner-title, .banner-msg').forEach((elem)=>{
     elem.classList.add('hidden')
     //console.log('added hidden class to - ',elem)
@@ -397,9 +478,10 @@ function hideBanner(){
   //console.log('Banner ok button click');
   bannerOverlay.classList.add("hidden");
   screen1.classList.add("hidden");
-  content.querySelector('.banner-placeholder').classList.remove('hidden')
-  const helem=header.querySelector('.notif-header')
-  const pelem = content.querySelector('.notif-content')
+  const placeholder = content ? content.querySelector('.banner-placeholder') : null
+  if (placeholder) placeholder.classList.remove('hidden')
+  const helem=header ? header.querySelector('.notif-header') : null
+  const pelem = content ? content.querySelector('.notif-content') : null
   if(helem){
     helem.remove()
 
