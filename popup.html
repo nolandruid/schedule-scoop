@@ -33,18 +33,33 @@
         <div class="node" id="timetable-tool">
           <a href="#">
             <i class='bx bxs-download central' style='color:#fff4f4'  ></i>
-            <span class="link-name">Export Timetable</span>
+            <span class="link-name">Select Calendar</span>
           </a>
             <i class="bx bxs-chevron-down arrow central"></i>
         </div>
         <ul class="sub-menu">
           <li>
-            <a href="#" class="selector carleton require-opened-cu" data-school="carleton" data-url="https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd" data-calendar="https://central.carleton.ca/prod/bwskfshd.P_CrseSchd" data-timetables="https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl" data-injection="carleton-timetables.js">
-              <span class="force-active">Carleton</span>                                                                                                                                                                          
-              <div class="config-container" data-school="carleton" data-node="timetable-tool">
-                <span class="node-state" data-school="carleton" data-node="timetable-tool">Winter 2025</span>
-                <i class="bx bxs-edit-alt config-btn" data-school="carleton" data-node="timetable-tool"></i>
-              </div>
+            <a href="#" class="calendar-option" data-calendar-type="google">
+              <i class='bx bxl-google' style='color:#4285f4'></i>
+              <span class="force-active">Google Calendar</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="calendar-option" data-calendar-type="outlook">
+              <i class='bx bxl-microsoft' style='color:#0078d4'></i>
+              <span class="force-active">Outlook</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="calendar-option" data-calendar-type="apple">
+              <i class='bx bxl-apple' style='color:#000000'></i>
+              <span class="force-active">Apple Calendar</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="calendar-option" data-calendar-type="ics">
+              <i class='bx bx-file' style='color:#ffffff'></i>
+              <span class="force-active">ICS File</span>
             </a>
           </li>
         </ul>
