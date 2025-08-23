@@ -1,4 +1,3 @@
-
 const nodes = document.querySelectorAll(".node");
 const staticNodes = document.querySelectorAll(".node.const.config");
 const nodeSelectors = document.querySelectorAll(".selector");
@@ -33,7 +32,6 @@ const header = document.querySelector('.banner-header');
 const content = document.querySelector('.banner-content');
 const ok = document.querySelector('.banner-ok-btn');
 const screen1 = document.querySelector(".banner-screen");
-
 
 const policyAgreementCheckbox = document.getElementById('policy-agreement-checkbox');
 const policyAgreementBtn = document.getElementById('policy-agreement-btn')
@@ -263,6 +261,11 @@ if (showUpdates && showUpdates.addEventListener) {
   })
 }
 
+/**
+ * Injects a content script into a specific tab
+ * @param {number} tabId - ID of the target tab
+ * @param {string} file - Path to the script file to inject
+ */
 function injectScript(tabId, file) {
   chrome.scripting.executeScript({
     target: { tabId: tabId },
@@ -270,6 +273,10 @@ function injectScript(tabId, file) {
   });
 }
 
+/**
+ * Opens a URL in a new tab or focuses existing tab if already open
+ * @param {string} requestUrl - URL to open
+ */
 function open(requestUrl){
   if(requestUrl){
     chrome.tabs.query({'url':requestUrl}, tabs => {
@@ -283,10 +290,20 @@ function open(requestUrl){
   }
 }
 
+/**
+ * Loads Carleton timetable by injecting the appropriate script
+ * @param {HTMLElement} node - DOM element containing dataset attributes for injection
+ */
 function loaderCarleton(node){
   injectCarleton(node.dataset.injection, node.dataset.url, node.dataset.timetables)
 }
 
+/**
+ * Injects Carleton timetable script into active tab or creates new tab
+ * @param {string} file - Path to the script file to inject
+ * @param {string} login - Login URL for Carleton
+ * @param {string} timetables - Timetables URL pattern to match
+ */
 function injectCarleton(file, login, timetables){
   if (typeof timetables !== 'string' || typeof file !== 'string' || typeof login !== 'string') {
     return;

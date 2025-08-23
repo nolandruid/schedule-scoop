@@ -49,7 +49,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Search for all console statements and remove them, or replace with proper logging
   </details>
 
-- [ ] **Add proper JSDoc comments**
+- [*] **Add proper JSDoc comments**
   <details>
   <summary>Details</summary>
   > **What**: Add documentation comments to all functions explaining what they do

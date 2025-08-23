@@ -1,4 +1,9 @@
 // Helper to promisify chrome.storage.session.get
+/**
+ * Promisifies chrome.storage.session.get for easier async/await usage
+ * @param {string|Array|Object} key - Storage key(s) to retrieve
+ * @returns {Promise<Object>} Promise that resolves with the storage result
+ */
 const getSession = (key) => {
   return new Promise((resolve) => {
     chrome.storage.session.get(key, (result) => resolve(result));
@@ -6,6 +11,11 @@ const getSession = (key) => {
 };
 
 // Helper to promisify chrome.storage.session.set
+/**
+ * Promisifies chrome.storage.session.set for easier async/await usage
+ * @param {Object} obj - Object containing key-value pairs to store
+ * @returns {Promise<void>} Promise that resolves when storage is complete
+ */
 const setSession = (obj) => {
   return new Promise((resolve) => {
     chrome.storage.session.set(obj, () => resolve());
@@ -13,6 +23,11 @@ const setSession = (obj) => {
 };
 
 // Helper to promisify chrome.storage.local.get
+/**
+ * Promisifies chrome.storage.local.get for easier async/await usage
+ * @param {string|Array|Object} key - Storage key(s) to retrieve
+ * @returns {Promise<Object>} Promise that resolves with the storage result
+ */
 const getLocal = (key) => {
   return new Promise((resolve) => {
     chrome.storage.local.get(key, (result) => resolve(result));
@@ -20,6 +35,11 @@ const getLocal = (key) => {
 };
 
 // Helper to promisify chrome.storage.local.set
+/**
+ * Promisifies chrome.storage.local.set for easier async/await usage
+ * @param {Object} obj - Object containing key-value pairs to store
+ * @returns {Promise<void>} Promise that resolves when storage is complete
+ */
 const setLocal = (obj) => {
   return new Promise((resolve) => {
     chrome.storage.local.set(obj, () => resolve());
@@ -27,6 +47,11 @@ const setLocal = (obj) => {
 };
 
 // Helper to promisify chrome.tabs.create
+/**
+ * Promisifies chrome.tabs.create for easier async/await usage
+ * @param {Object} options - Tab creation options (url, active, etc.)
+ * @returns {Promise<chrome.tabs.Tab>} Promise that resolves with the created tab
+ */
 const createTab = (options) => {
   return new Promise((resolve) => {
     chrome.tabs.create(options, (tab) => resolve(tab));
@@ -34,6 +59,11 @@ const createTab = (options) => {
 };
 
 // Helper to promisify chrome.tabs.remove
+/**
+ * Promisifies chrome.tabs.remove for easier async/await usage
+ * @param {number} tabId - ID of the tab to remove
+ * @returns {Promise<void>} Promise that resolves when tab is removed
+ */
 const removeTab = (tabId) => {
   return new Promise((resolve) => {
     chrome.tabs.remove(tabId, () => resolve());
@@ -173,10 +203,14 @@ chrome.webNavigation.onCommitted.addListener((details) => {
   ]
 });
 
+/**
+ * Injects a content script into a specific tab
+ * @param {number} tabId - ID of the target tab
+ * @param {string} file - Path to the script file to inject
+ */
 const injectScript = (tabId, file) => {
   chrome.scripting.executeScript({
     target: { tabId: tabId },
     files: [file]
   });
 };
-  

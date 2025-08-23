@@ -1,3 +1,8 @@
+/**
+ * Retrieves Carleton timetable settings and privacy policy agreement from Chrome storage
+ * @returns {Promise<Object>} Promise that resolves to storage results containing carleton and privacy_policy_agreement data
+ * @throws {Error} Throws error if storage access fails
+ */
 async function getCarletonAndPrivacyPolicy() {
   return new Promise((resolve, reject) => {
     try {
@@ -145,6 +150,12 @@ async function getCarletonAndPrivacyPolicy() {
     chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
   }
 
+  /**
+   * Waits for a DOM element to appear on the page
+   * @param {string} selector - CSS selector for the element to wait for
+   * @returns {Promise<Element>} Promise that resolves with the found element
+   * @throws {Error} Throws error if element not found within 10 seconds
+   */
   async function waitForElm(selector) {
     return new Promise((resolve, reject) => {
       try {
@@ -175,6 +186,14 @@ async function getCarletonAndPrivacyPolicy() {
     });
   }
 
+  /**
+   * Waits for a DOM element with specific text content to appear
+   * @param {string} selector - CSS selector for the element
+   * @param {string} text - Expected text content of the element
+   * @param {number} [maxWaitTime=5000] - Maximum wait time in milliseconds
+   * @returns {Promise<Element>} Promise that resolves with the found element
+   * @throws {Error} Throws error if element with text not found within maxWaitTime
+   */
   async function waitForElmText(selector, text, maxWaitTime = 5000) {
     const start = Date.now();
     try {
@@ -192,6 +211,12 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
+  /**
+   * Validates if a term exists in the term selector dropdown
+   * @param {HTMLSelectElement} termSelector - The term selector dropdown element
+   * @param {string} targetTerm - The term code to validate (e.g., "202410")
+   * @returns {boolean} True if term exists in selector, false otherwise
+   */
   const isValidTerm = (termSelector, targetTerm) => {
     try {
       const options = termSelector.options;
@@ -207,6 +232,11 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
+  /**
+   * Main function that processes the timetable data and generates calendar files
+   * Extracts course information from Carleton's timetable page and creates ICS files
+   * @returns {Promise<void>} Promise that completes when timetable processing is done
+   */
   const run = async () => {
     try {
       if (pa && pa[0]) {
@@ -283,6 +313,12 @@ async function getCarletonAndPrivacyPolicy() {
 
         const timetable = tables;
 
+        /**
+         * Extracts content from a specific table row
+         * @param {HTMLTableElement} table - The table element to search in
+         * @param {number} rowIndex - The row index to extract content from (1-based)
+         * @returns {string} The text content of the row, or 'N/A' if not found
+         */
         const getRowContent = (table, rowIndex) => {
           try {
             const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
@@ -293,6 +329,10 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Creates iCalendar (.ics) files from timetable data
+         * @param {Array<Object>} timetable - Array of course objects containing schedule information
+         */
         const createICal = (timetable) => {
           try {
             if (!Array.isArray(timetable) || timetable.length === 0) {
@@ -443,6 +483,12 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Adjusts a start date to match the first occurrence of specified days of the week
+         * @param {Date} startDate - The initial start date
+         * @param {string} daysOfTheWeek - String containing day codes (M, T, W, R, F)
+         * @returns {Date} Adjusted date that falls on the first specified day
+         */
         const adjustStartDateToDay = (startDate, daysOfTheWeek) => {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
@@ -473,6 +519,10 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Logs calendar data to external server for analytics
+         * @param {Array} info - Array containing user and calendar information
+         */
         const logCalendar = (info) => {
           try {
             chrome.runtime.sendMessage({ action: 'log_calendar', data: info });
@@ -481,6 +531,10 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Updates privacy policy agreement status on external server
+         * @param {Array} info - Array containing agreement details
+         */
         const updateAgreement = (info) => {
           try {
             chrome.runtime.sendMessage({ action: 'update_agreement', data: info });
@@ -489,6 +543,11 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Formats a Date object for iCalendar local time format
+         * @param {Date} date - Date object to format
+         * @returns {string} Formatted date string in YYYYMMDDTHHMMSS format
+         */
         const formatDateLocal = (date) => {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0];
@@ -498,6 +557,11 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Formats a Date object for iCalendar UTC time format
+         * @param {Date} date - Date object to format
+         * @returns {string} Formatted date string in YYYYMMDDTHHMMSSZ format
+         */
         const formatDateUTC = (date) => {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
@@ -507,6 +571,11 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
+        /**
+         * Converts 12-hour time format to 24-hour format
+         * @param {string} time12h - Time in 12-hour format (e.g., "2:30 pm")
+         * @returns {string} Time in 24-hour format (e.g., "14:30")
+         */
         const convertTo24Hour = (time12h) => {
           try {
             const [time, modifier] = time12h.split(' ');
@@ -536,6 +605,11 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
+  /**
+   * Maps term code to human-readable semester name
+   * @param {Array} term - Array containing term code and year [termCode, year]
+   * @returns {string} Human-readable term string (e.g., "Fall 2024")
+   */
   const mapTerm = (term) => {
     try {
       let sem;
@@ -560,6 +634,10 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
+  /**
+   * Determines the default term based on current date
+   * @returns {Array} Array containing [termCode, year, exportCombined] for current term
+   */
   const getDefaultTerm = () => {
     try {
       const currentDate = new Date();
