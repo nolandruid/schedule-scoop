@@ -1,41 +1,82 @@
-const nodes = document.querySelectorAll(".node");
-const staticNodes = document.querySelectorAll(".node.const.config");
-const nodeSelectors = document.querySelectorAll(".selector");
-const configBtns = document.querySelectorAll(".config-btn");
-const nodeLists = document.querySelectorAll('.sub-menu a')
-// Footer
-const changePopupBtn = document.querySelector('.change-logo-btn');
-const showUpdates = document.querySelector('.show-version-details');
+/**
+ * Safely gets DOM elements with validation to prevent null reference errors
+ * @param {string} selector - CSS selector or element ID
+ * @param {string} method - 'querySelector', 'querySelectorAll', or 'getElementById'
+ * @param {boolean} required - Whether element is required (logs warning if not found)
+ * @returns {Element|NodeList|null} The found element(s) or null if not found
+ */
+const safeGetElement = (selector, method = 'querySelector', required = true) => {
+  try {
+    if (!selector || typeof selector !== 'string') {
+      if (required) console.warn(`Invalid selector provided: ${selector}`);
+      return null;
+    }
+    
+    let element;
+    switch (method) {
+      case 'querySelector':
+        element = document.querySelector(selector);
+        break;
+      case 'querySelectorAll':
+        element = document.querySelectorAll(selector);
+        break;
+      case 'getElementById':
+        element = document.getElementById(selector);
+        break;
+      default:
+        if (required) console.warn(`Invalid method: ${method}`);
+        return null;
+    }
+    
+    if (required && (!element || (element.length !== undefined && element.length === 0))) {
+      console.warn(`Required element not found: ${selector}`);
+    }
+    
+    return element;
+  } catch (err) {
+    if (required) console.error(`Error getting element ${selector}:`, err);
+    return null;
+  }
+}
 
-const allOverlays = document.querySelectorAll('.config-overlay');
-const darkScreen = document.querySelector(".dark-screen");
+const nodes = safeGetElement(".node", 'querySelectorAll', false) || [];
+const staticNodes = safeGetElement(".node.const.config", 'querySelectorAll', false) || [];
+const nodeSelectors = safeGetElement(".selector", 'querySelectorAll', false) || [];
+const configBtns = safeGetElement(".config-btn", 'querySelectorAll', false) || [];
+const nodeLists = safeGetElement('.sub-menu a', 'querySelectorAll', false) || [];
+// Footer
+const changePopupBtn = safeGetElement('.change-logo-btn');
+const showUpdates = safeGetElement('.show-version-details');
+
+const allOverlays = safeGetElement('.config-overlay', 'querySelectorAll', false) || [];
+const darkScreen = safeGetElement(".dark-screen");
 // Buttons
-const infoBtns = document.querySelectorAll('.info-btn');
-const saveBtns = document.querySelectorAll('.config-save-btn');
-const resetBtns = document.querySelectorAll('.config-reset-btn');
-const presetBtns = document.querySelectorAll('.config-preset-btn');
-const closeBtns = document.querySelectorAll('.close-btn');
-const dropdownConfigSelectors = document.querySelectorAll('.dropdown-config-select');
-const policyBtns = document.querySelectorAll('.config-policy-btn');
+const infoBtns = safeGetElement('.info-btn', 'querySelectorAll', false) || [];
+const saveBtns = safeGetElement('.config-save-btn', 'querySelectorAll', false) || [];
+const resetBtns = safeGetElement('.config-reset-btn', 'querySelectorAll', false) || [];
+const presetBtns = safeGetElement('.config-preset-btn', 'querySelectorAll', false) || [];
+const closeBtns = safeGetElement('.close-btn', 'querySelectorAll', false) || [];
+const dropdownConfigSelectors = safeGetElement('.dropdown-config-select', 'querySelectorAll', false) || [];
+const policyBtns = safeGetElement('.config-policy-btn', 'querySelectorAll', false) || [];
 
 // Switches
-const switches = document.querySelectorAll('.toggle-switch')
+const switches = safeGetElement('.toggle-switch', 'querySelectorAll', false) || [];
 
-const semesterSelect = document.getElementById("semester-select");
-const yearSelect = document.getElementById("year-select");
-const timetableOverlay = document.querySelector(".timetable.config-overlay");
-const schoolSelect = document.getElementById("school-select");
-const exportMode = document.getElementById('export-mode')
+const semesterSelect = safeGetElement("semester-select", 'getElementById');
+const yearSelect = safeGetElement("year-select", 'getElementById');
+const timetableOverlay = safeGetElement(".timetable.config-overlay");
+const schoolSelect = safeGetElement("school-select", 'getElementById');
+const exportMode = safeGetElement('export-mode', 'getElementById');
 
-const bannerOverlay = document.querySelector('.banner-overlay');
-const header = document.querySelector('.banner-header');
-const content = document.querySelector('.banner-content');
-const ok = document.querySelector('.banner-ok-btn');
-const screen1 = document.querySelector(".banner-screen");
+const bannerOverlay = safeGetElement('.banner-overlay');
+const header = safeGetElement('.banner-header');
+const content = safeGetElement('.banner-content');
+const ok = safeGetElement('.banner-ok-btn');
+const screen1 = safeGetElement(".banner-screen");
 
-const policyAgreementCheckbox = document.getElementById('policy-agreement-checkbox');
-const policyAgreementBtn = document.getElementById('policy-agreement-btn')
-const policyModal = document.querySelector(".privacy-policy-modal")
+const policyAgreementCheckbox = safeGetElement('policy-agreement-checkbox', 'getElementById');
+const policyAgreementBtn = safeGetElement('policy-agreement-btn', 'getElementById');
+const policyModal = safeGetElement(".privacy-policy-modal");
 
 const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
 const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
@@ -370,7 +411,7 @@ function setTimetableState(school, term) {
       return;
   }
 
-  const targetState = document.querySelector(`.node-state[data-school="${school}"]`);
+  const targetState = safeGetElement(`.node-state[data-school="${school}"]`, 'querySelector', false);
 
   if (targetState) {
     targetState.textContent = `${sem} ${term[1]}`;
@@ -469,32 +510,33 @@ function arraysEqual(arr1, arr2) {
 }
 
 function notify(warning){
-  if (typeof warning !== 'string') return;
+  if (typeof warning !== 'string' || !bannerOverlay) return;
   bannerOverlay.querySelectorAll('.banner-title, .banner-msg').forEach((elem)=>{
-    elem.classList.add('hidden')
+    if (elem) elem.classList.add('hidden')
     //console.log('added hidden class to - ',elem)
   })
   bannerOverlay.querySelectorAll(warning).forEach((elem)=>{
-    elem.classList.remove('hidden')
+    if (elem) elem.classList.remove('hidden')
     //console.log('remove hidden from - ',elem)
   })
-  screen1.classList.remove('hidden')
-  bannerOverlay.classList.remove('hidden')
+  if (screen1) screen1.classList.remove('hidden')
+  if (bannerOverlay) bannerOverlay.classList.remove('hidden')
   //console.log('sent notification - ',warning)
 }
 
 function hideOverlays(){
-  allOverlays.forEach(o => {
-    if(!o.classList.contains('hidden'))
-    o.classList.add('hidden');
-  });
-  darkScreen.classList.add("hidden");
+  if (allOverlays && allOverlays.forEach) {
+    allOverlays.forEach(o => {
+      if(o && !o.classList.contains('hidden'))
+      o.classList.add('hidden');
+    });
+  }
+  if (darkScreen) darkScreen.classList.add("hidden");
 }
-
 function hideBanner(){
   //console.log('Banner ok button click');
-  bannerOverlay.classList.add("hidden");
-  screen1.classList.add("hidden");
+  if (bannerOverlay) bannerOverlay.classList.add("hidden");
+  if (screen1) screen1.classList.add("hidden");
   const placeholder = content ? content.querySelector('.banner-placeholder') : null
   if (placeholder) placeholder.classList.remove('hidden')
   const helem=header ? header.querySelector('.notif-header') : null
@@ -512,9 +554,9 @@ function init(){
   chrome.storage.local.get(['privacy_policy_agreement'],(result)=>{
     const p=result['privacy_policy_agreement']
     if(!p || !p[0]){
-      screen1.classList.remove('hidden')
-      policyModal.classList.remove('hidden')
-      policyAgreementBtn.disabled=true;
+      if (screen1) screen1.classList.remove('hidden')
+      if (policyModal) policyModal.classList.remove('hidden')
+      if (policyAgreementBtn) policyAgreementBtn.disabled=true;
     }
   })
   initTimetable()
