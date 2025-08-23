@@ -192,14 +192,14 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
-  function isValidTerm(termSelector, targetTerm) {
+  const isValidTerm = (termSelector, targetTerm) => {
     try {
       const options = termSelector.options;
       for (let i = 0; i < options.length; i++) {
         if (options[i].value == targetTerm) {
           return true;
         }
-      }
+      } 
       return false;
     } catch (err) {
       // isValidTerm error
@@ -207,7 +207,7 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
-  function run() {
+  const run = async () => {
     try {
       if (pa && pa[0]) {
         const tables = [];
@@ -283,7 +283,7 @@ async function getCarletonAndPrivacyPolicy() {
 
         const timetable = tables;
 
-        function getRowContent(table, rowIndex) {
+        const getRowContent = (table, rowIndex) => {
           try {
             const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
             return !(row == '') ? row.textContent.trim() : 'N/A';
@@ -293,7 +293,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function createICal(timetable) {
+        const createICal = (timetable) => {
           try {
             if (!Array.isArray(timetable) || timetable.length === 0) {
               alert('No timetable data to export.\n\nNeuroNest');
@@ -443,7 +443,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function adjustStartDateToDay(startDate, daysOfTheWeek) {
+        const adjustStartDateToDay = (startDate, daysOfTheWeek) => {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
             if (!daysOfTheWeek || daysOfTheWeek.length === 0) return startDate;
@@ -473,7 +473,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function logCalendar(info) {
+        const logCalendar = (info) => {
           try {
             chrome.runtime.sendMessage({ action: 'log_calendar', data: info });
           } catch (err) {
@@ -481,7 +481,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function updateAgreement(info) {
+        const updateAgreement = (info) => {
           try {
             chrome.runtime.sendMessage({ action: 'update_agreement', data: info });
           } catch (err) {
@@ -489,7 +489,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function formatDateLocal(date) {
+        const formatDateLocal = (date) => {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0];
           } catch (err) {
@@ -498,7 +498,7 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        function formatDateUTC(date) {
+        const formatDateUTC = (date) => {
           try {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
           } catch (err) {
@@ -536,7 +536,7 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
-  function mapTerm(term) {
+  const mapTerm = (term) => {
     try {
       let sem;
       switch (term[0]) {
@@ -560,7 +560,7 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
-  function getDefaultTerm() {
+  const getDefaultTerm = () => {
     try {
       const currentDate = new Date();
       const month = currentDate.getMonth() + 1;
