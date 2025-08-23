@@ -1,6 +1,6 @@
 chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
-  var r;
-  var pa;
+  let r;
+  let pa;
   if(!results){
     r=getDefaultTerm()
     alert("No default term found;\Using:",r)
@@ -62,7 +62,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
   }
 
  
-  function waitForElm(selector) {
+  const waitForElm = (selector) => {
     return new Promise(resolve => {
       //console.log('waiting for',selector,'...')
         if (document.querySelector(selector)) {
@@ -84,7 +84,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     });
   }
 
-  function waitForElmText(selector, text, maxWaitTime = 5000) {
+  const waitForElmText = (selector, text, maxWaitTime = 5000) => {
     return Promise.race([
       new Promise((resolve, reject) => {
         const observer = new MutationObserver((mutations, observer) => {
@@ -106,7 +106,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     ]);
   }
 
-  function isValidTerm(termSelector, targetTerm) {
+  const isValidTerm = (termSelector, targetTerm)=> {
     const options = termSelector.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].value == targetTerm) {
@@ -118,7 +118,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
 
   
 
-  function run(){
+  const run = ()=>{
     if(pa[0]){
       //console.log('running  downloader.')
       const tables = [];
@@ -179,18 +179,18 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
 
       const timetable= tables;
       //console.log('timetable:\n',timetable)
-      function getRowContent(table, rowIndex) {
+      const getRowContent = (table, rowIndex)=> {
         const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
         return !(row=='') ? row.textContent.trim() : 'N/A';
       }
       
-      function createICal(timetable) {
+      const createICal = (timetable)=> {
         //console.log('Creating iCal with timetable:', timetable);
         
         if(exportCombined){
           let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
-          var count=0;
-          var allCourses='';
+          let count=0;
+          let allCourses='';
           timetable.forEach(node => {
             //console.log('Processing node:', node);
             node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
@@ -212,7 +212,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
             const endMinute = parseInt(endTime[1], 10);
             const timeNoSpace = node.classStartTime.replace(/\s/g, '');
             const timeNoSpace2 = node.classEndTime.replace(/\s/g, '');
-            var dayList = []
+            let dayList = []
             node.daysOfTheWeek.split('').forEach(day => {
               //console.log('day:', day);
               const dayOfWeek = daysMap[day];
@@ -248,7 +248,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = userInfo2+'.ics';
+            a.download = `${userInfo2}.ics`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -260,12 +260,12 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
           logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]);
         }
         else{
-          var totalCount=0
-          var totalIcs = '';
-          var allCourses='';
+          let totalCount=0
+          let totalIcs = '';
+          let allCourses='';
           timetable.forEach(node => {
             let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
-            var count=0;
+            let count=0;
             //console.log('Processing node:', node);
             node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
             const daysMap = {
@@ -286,7 +286,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
             const endMinute = parseInt(endTime[1], 10);
             const timeNoSpace = node.classStartTime.replace(/\s/g, '');
             const timeNoSpace2 = node.classEndTime.replace(/\s/g, '');
-            var dayList = []
+            let dayList = []
             node.daysOfTheWeek.split('').forEach(day => {
               //console.log('day:', day);
               const dayOfWeek = daysMap[day];
@@ -324,7 +324,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `${node.courseCode}-${node.courseSection}`+'.ics';
+              a.download = `${node.courseCode}-${node.courseSection}.ics`;
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
@@ -339,7 +339,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
         }
       }
 
-      function adjustStartDateToDay(startDate, daysOfTheWeek) {
+      const adjustStartDateToDay = (startDate, daysOfTheWeek) => {
         const daysMap = {
           'M': 1, // Monday
           'T': 2, // Tuesday
@@ -365,26 +365,26 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
         updateAgreement([userInfo3, "NeuroNest", pa[1], new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false }), pa[0]?"Yes":"No"])
       }
 
-      function logCalendar(info){
+      const logCalendar = (info)=>{
         chrome.runtime.sendMessage({action:'log_calendar', data:info});
       }
       
-      function updateAgreement(info){
+      const updateAgreement = (info)=>{
         chrome.runtime.sendMessage({action:'update_agreement', data:info});
       }
       
-      function formatDateLocal(date) {
+      const formatDateLocal = (date)=> {
         //console.log('Formatting date local:', date);
         //console.log('finished date local:', date.toISOString().replace(/[-:]/g, '').split('.')[0]);
         return date.toISOString().replace(/[-:]/g, '').split('.')[0];
       }
       
-      function formatDateUTC(date) {
+      const formatDateUTC = (date)=> {
         //console.log('Formatting date:', date);
-        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        return `${date.toISOString().replace(/[-:]/g, '').split('.')[0]} Z`;
       }
       
-      const convertTo24Hour = (time12h) => {
+      const convertTo24Hour = (time12h)=> {
         const [time, modifier] = time12h.split(' ');
       
         let [hours, minutes] = time.split(':');
@@ -429,7 +429,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     }
   }
 
-  function mapTerm(term){
+  const mapTerm = (term)=>{
     let sem;
     switch (term[0]) {
       case '30':
@@ -448,7 +448,7 @@ chrome.storage.local.get(['carleton',"privacy_policy_agreement"],(results)=>{
     return `${sem} ${term[1]}`
   }
 
-  function getDefaultTerm() {
+  const getDefaultTerm = ()=>{
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
     let year = String(currentDate.getFullYear());

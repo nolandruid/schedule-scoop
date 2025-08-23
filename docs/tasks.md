@@ -1,4 +1,4 @@
-# Timetable Tools - Development Tasks
+  # Timetable Tools - Development Tasks
 
 A Chrome extension that helps Carleton University students export their course timetables directly to their preferred calendar service (Google Calendar, Outlook, Apple Calendar, etc.) through direct integration.
 
@@ -16,7 +16,7 @@ A Chrome extension that helps Carleton University students export their course t
 <summary><strong>Phase 1: Code Cleanup & Modernization (4-6 hours)</strong></summary>
 
 ### Modernize JavaScript code (2-3 hours)
-- [ ] **Convert to ES6+ syntax**
+- [*] **Convert to ES6+ syntax**
   <details>
   <summary>Details</summary>
   > **What**: Update carleton-timetables.js to use modern JavaScript features
