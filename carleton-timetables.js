@@ -21,111 +21,6 @@ async function getCarletonAndPrivacyPolicy() {
   });
 }
 
-/**
- * Validates that a DOM element exists and is not null
- * @param {Element|null} element - The DOM element to validate
- * @param {string} elementName - Human-readable name for error messages
- * @returns {boolean} True if element is valid, false otherwise
- * @throws {Error} Throws error with descriptive message if element is invalid
- */
-const validateElement = (element, elementName) => {
-  if (!element) {
-    const errorMsg = `Required element not found: ${elementName}`;
-    console.error(errorMsg);
-    throw new Error(errorMsg);
-  }
-  return true;
-}
-
-/**
- * Safely gets a DOM element by ID with validation
- * @param {string} id - The element ID to search for
- * @param {boolean} required - Whether the element is required (throws error if not found)
- * @returns {Element|null} The DOM element or null if not found and not required
- * @throws {Error} Throws error if element is required but not found
- */
-const safeGetElementById = (id, required = true) => {
-  if (typeof id !== 'string' || id.trim() === '') {
-    throw new Error('Element ID must be a non-empty string');
-  }
-  
-  const element = document.getElementById(id);
-  
-  if (required && !element) {
-    throw new Error(`Required element with ID '${id}' not found`);
-  }
-  
-  return element;
-}
-
-/**
- * Safely queries a DOM element with validation
- * @param {string} selector - The CSS selector to search for
- * @param {boolean} required - Whether the element is required (throws error if not found)
- * @returns {Element|null} The DOM element or null if not found and not required
- * @throws {Error} Throws error if element is required but not found
- */
-const safeQuerySelector = (selector, required = true) => {
-  if (typeof selector !== 'string' || selector.trim() === '') {
-    throw new Error('Selector must be a non-empty string');
-  }
-  
-  const element = document.querySelector(selector);
-  
-  if (required && !element) {
-    throw new Error(`Required element with selector '${selector}' not found`);
-  }
-  
-  return element;
-}
-
-/**
- * Safely extracts user information from HTML content with validation
- * @param {string} htmlContent - The HTML content to parse
- * @param {number} brIndex - Which <br> tag to target (0-based)
- * @param {string} fallback - Fallback value if parsing fails
- * @returns {string} Extracted user info or fallback value
- */
-const safeExtractUserInfo = (htmlContent, brIndex, fallback) => {
-  try {
-    if (!htmlContent || typeof htmlContent !== 'string') {
-      return fallback;
-    }
-    
-    const brParts = htmlContent.split('<br>');
-    if (brIndex >= brParts.length || brIndex < 0) {
-      return fallback;
-    }
-    
-    const targetPart = brParts[brIndex];
-    if (!targetPart || typeof targetPart !== 'string') {
-      return fallback;
-    }
-    
-    const trimmed = targetPart.trim();
-    if (!trimmed) {
-      return fallback;
-    }
-    
-    const words = trimmed.split(' ').filter(word => word.length > 0);
-    if (words.length === 0) {
-      return fallback;
-    }
-    
-    // For userInfo2: take first 2 words, for userInfo3: skip first word
-    if (brIndex === 1) {
-      return words.slice(0, 2).join(' ') || fallback;
-    } else if (brIndex === 0) {
-      return words.slice(1).join(' ') || fallback;
-    }
-    
-    return fallback;
-  } catch (err) {
-    console.error('Error extracting user info:', err);
-    return fallback;
-  }
-}
-
 (async () => {
   let results;
   try {
@@ -155,13 +50,13 @@ const safeExtractUserInfo = (htmlContent, brIndex, fallback) => {
     return;
   }
 
-  const termSelector = safeGetElementById('term_id', false);
-  const bigFatHeader = safeQuerySelector('body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2', false);
-  const timetableNav = safeQuerySelector('body > div.footerlinksdiv > span > map > p:nth-child(2) > a:nth-child(2)', false);
-  const calendarNav = safeQuerySelector('body > div.pagebodydiv > table.menuplaintable > tbody > tr:nth-child(3) > td:nth-child(2) > span > ul > li:nth-child(1) > a:nth-child(4)', false);
+  const termSelector = document.getElementById('term_id');
+  const bigFatHeader = 'body > div.pagetitlediv > table > tbody > tr:nth-child(1) > td:nth-child(1) > h2';
+  const timetableNav = 'body > div.footerlinksdiv > span > map > p:nth-child(2) > a:nth-child(2)';
+  const calendarNav = 'body > div.pagebodydiv > table.menuplaintable > tbody > tr:nth-child(3) > td:nth-child(2) > span > ul > li:nth-child(1) > a:nth-child(4)';
   const targetTerm = String(r[1]) + String(r[0]);
   const exportCombined = !!r[2];
-  const submitBtn = safeQuerySelector('input[type=submit]');
+  const submitBtn = document.querySelector('input[type=submit]');
   const tableElement = 'table.datadisplaytable[summary="This table lists the scheduled meeting times and assigned instructors for this class.."]';
 
   try {
@@ -176,8 +71,7 @@ const safeExtractUserInfo = (htmlContent, brIndex, fallback) => {
       waitForElmText(calendarNav, 'Student Timetable').then(
         () => {
           try {
-            const calendarElement = safeQuerySelector(calendarNav, true);
-            calendarElement.click();
+            document.querySelector(calendarNav).click();
           } catch (err) {
             // Error clicking calendarNav
             alert('Navigation error.\n\nNeuroNest');
@@ -193,8 +87,7 @@ const safeExtractUserInfo = (htmlContent, brIndex, fallback) => {
       waitForElmText(timetableNav, 'Detail Schedule').then(
         () => {
           try {
-            const timetableElement = safeQuerySelector(timetableNav, true);
-            timetableElement.click();
+            document.querySelector(timetableNav).click();
           } catch (err) {
             // Error clicking timetableNav
             alert('Navigation error.\n\nNeuroNest');
@@ -352,8 +245,8 @@ const safeExtractUserInfo = (htmlContent, brIndex, fallback) => {
         let staticHeadersDiv, userInfo2, userInfo3;
         try {
           staticHeadersDiv = document.querySelector('.staticheaders');
-          userInfo2 = safeExtractUserInfo(staticHeadersDiv ? staticHeadersDiv.innerHTML : '', 1, 'Nameless');
-userInfo3 = safeExtractUserInfo(staticHeadersDiv ? staticHeadersDiv.innerHTML : '', 0, 'Unknown User');
+          userInfo2 = staticHeadersDiv ? staticHeadersDiv.innerHTML.split('<br>')[1].trim().split(' ').slice(0, 2).join(' ') : 'Nameless';
+          userInfo3 = staticHeadersDiv ? staticHeadersDiv.innerHTML.split('<br>')[0].trim().split(' ').slice(1).join(' ') : 'Unknown User';
         } catch (err) {
           // Error extracting user info
           userInfo2 = 'Nameless';

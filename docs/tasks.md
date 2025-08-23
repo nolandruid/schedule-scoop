@@ -65,7 +65,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Use camelCase for variables/functions, PascalCase for classes, kebab-case for files
   </details>
 
-- [*] **Add input validation**
+- [ ] **Add input validation**
   <details>
   <summary>Details</summary>
   > **What**: Add checks to ensure data is valid before processing it
