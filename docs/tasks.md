@@ -65,12 +65,13 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Use camelCase for variables/functions, PascalCase for classes, kebab-case for files
   </details>
 
-- [ ] **Add input validation**
+- [-] **Add input validation**
   <details>
   <summary>Details</summary>
   > **What**: Add checks to ensure data is valid before processing it
   > **Why**: Prevents crashes and unexpected behavior from invalid data
   > **How**: Add checks for null/undefined values, validate data types, and handle edge cases
+  > **Note**: This is not a priority for now. Use phase1-clean-code-structure branch for development.
   </details>
 
 </details>
