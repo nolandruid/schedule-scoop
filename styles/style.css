@@ -1024,3 +1024,43 @@ input:checked + .toggle-switch::before{
   cursor: not-allowed; /* Change cursor to indicate disabled state */
   opacity: 0.6; /* Reduce opacity */
 }
+
+/* Export Button Styling */
+.export-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 120px;
+  height: 45px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.export-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.export-btn i {
+  font-size: 16px;
+}
