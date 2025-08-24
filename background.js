@@ -71,10 +71,26 @@ const removeTab = (tabId) => {
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!message || typeof message !== 'object' || typeof message.action !== 'string') {
+    return false;
+  }
+
+  // Handle Google Calendar token request synchronously
+  if (message.action === 'getGoogleCalendarToken') {
+    chrome.identity.getAuthToken({ interactive: true }, (token) => {
+      if (chrome.runtime.lastError) {
+        console.error('Google Calendar auth error:', chrome.runtime.lastError);
+        sendResponse({ success: false, error: chrome.runtime.lastError });
+      } else {
+        console.log('Google Calendar token obtained successfully');
+        sendResponse({ success: true, token: token });
+      }
+    });
+    return true; // Keep message channel open for async response
+  }
+
+  // Handle other async operations
   (async () => {
-    if (!message || typeof message !== 'object' || typeof message.action !== 'string') {
-      return;
-    }
 
     if (message.action === 'newCarletonTempTab') {
       const isLogin = message && message.type === 'login';
@@ -115,7 +131,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       //console.log(`Updated ${key}.\nRemaining tabs:`, tabs);
     }
 
-    else if (message.action === 'end-timetable-request') {
+    if (message.action === 'end-timetable-request') {
       await setSession({ ['timetable-requested']: [false] });
     }
 
