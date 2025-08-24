@@ -37,6 +37,9 @@ const policyAgreementCheckbox = document.getElementById('policy-agreement-checkb
 const policyAgreementBtn = document.getElementById('policy-agreement-btn')
 const policyModal = document.querySelector(".privacy-policy-modal")
 
+// Calendar selection elements
+const calendarOptions = document.querySelectorAll('.calendar-option');
+
 const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
 const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
 
@@ -259,6 +262,20 @@ if (showUpdates && showUpdates.addEventListener) {
     open(url)
     if (window && typeof window.close === 'function') window.close()
   })
+}
+
+// Calendar option selection event listeners
+if (calendarOptions && calendarOptions.forEach) {
+  calendarOptions.forEach(option => {
+    if (option && option.addEventListener) {
+      option.addEventListener('click', (e) => {
+        const calendarType = option.dataset ? option.dataset.calendarType : undefined;
+        if (calendarType) {
+          selectCalendar(calendarType);
+        }
+      });
+    }
+  });
 }
 
 /**
@@ -518,5 +535,50 @@ function init(){
     }
   })
   initTimetable()
+  initCalendarSelection()
 }
+
 init()
+
+/**
+ * Handles calendar option selection
+ * @param {string} calendarType - Type of calendar selected (google, outlook, apple, ics)
+ */
+function selectCalendar(calendarType) {
+  // Remove selected class from all calendar options
+  calendarOptions.forEach(option => {
+    option.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked option
+  const selectedOption = document.querySelector(`[data-calendar-type="${calendarType}"]`);
+  if (selectedOption) {
+    selectedOption.classList.add('selected');
+  }
+  
+  // Store selected calendar type
+  setLocal('selected-calendar', calendarType);
+}
+
+/**
+ * Gets the currently selected calendar type
+ * @returns {string} Selected calendar type or default 'google'
+ */
+function getSelectedCalendar() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['selected-calendar'], (result) => {
+      const selectedCalendar = result['selected-calendar'] || 'google';
+      resolve(selectedCalendar);
+    });
+  });
+}
+
+/**
+ * Initializes calendar selection state from storage
+ */
+function initCalendarSelection() {
+  chrome.storage.local.get(['selected-calendar'], (result) => {
+    const selectedCalendar = result['selected-calendar'] || 'google';
+    selectCalendar(selectedCalendar);
+  });
+}

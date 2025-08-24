@@ -80,7 +80,7 @@ A Chrome extension that helps Carleton University students export their course t
 <summary><strong>Phase 2: Direct Calendar Integration (6-8 hours)</strong></summary>
 
 ### Implement calendar service integration (4-5 hours)
-- [ ] **Create calendar service selection UI**
+- [*] **Create calendar service selection UI**
   <details>
   <summary>Details</summary>
   > **What**: Design an interface for users to select their preferred calendar service

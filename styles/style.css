@@ -1064,3 +1064,32 @@ input:checked + .toggle-switch::before{
 .export-btn i {
   font-size: 16px;
 }
+
+/* Calendar option selection styles */
+.panel .nav-links li .sub-menu a.calendar-option {
+  border-radius: 8px;
+  margin: 2px 0;
+  transition: all 0.3s ease;
+}
+
+.panel .nav-links li .sub-menu a.calendar-option.selected {
+  background: linear-gradient(to right, #4CAF50, rgba(76, 175, 80, 0.3));
+  border: 2px solid #4CAF50;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.panel .nav-links li .sub-menu a.calendar-option.selected:hover {
+  background: linear-gradient(to right, #45a049, rgba(69, 160, 73, 0.3));
+  border-color: #45a049;
+  transform: scale(1.05);
+}
+
+.panel .nav-links li .sub-menu a.calendar-option:not(.selected):hover {
+  background: linear-gradient(to right, #5e54b8, rgba(126, 117, 230, 0));
+  transform: scale(1.05);
+}
+
+.panel .nav-links li .sub-menu a.calendar-option.selected .force-active {
+  font-weight: 600;
+}
