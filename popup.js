@@ -39,6 +39,9 @@ const policyModal = document.querySelector(".privacy-policy-modal")
 
 // Calendar selection elements
 const calendarOptions = document.querySelectorAll('.calendar-option');
+//Google Calendar API configuration
+const GOOGLE_CALENDAR_API_BASE = 'https://www.googleapis.com/calendar/v3';
+const GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
 const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
@@ -571,6 +574,65 @@ function getSelectedCalendar() {
       resolve(selectedCalendar);
     });
   });
+}
+
+/**
+ * Authenticates user with Google Calendar
+ * @returns {Promise<string>} Access token for Google Calendar API
+ */
+async function authenticateGoogleCalendar() {
+  return new Promise((resolve, reject) => {
+    chrome.identity.getAuthToken({ interactive: true }, (token) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(token);
+      }
+    });
+  });
+}
+
+/**
+ * Creates events in Google Calendar
+ * @param {Array} events - Array of calendar events to create
+ * @param {string} accessToken - Google Calendar API access token
+ */
+async function createGoogleCalendarEvents(events, accessToken) {
+  const calendarId = 'primary'; // Use primary calendar
+  
+  for (const event of events) {
+    const eventData = {
+      summary: event.title,
+      description: event.description || '',
+      start: {
+        dateTime: event.startDateTime,
+        timeZone: 'America/Toronto'
+      },
+      end: {
+        dateTime: event.endDateTime,
+        timeZone: 'America/Toronto'
+      },
+      location: event.location || ''
+    };
+
+    try {
+      const response = await fetch(`${GOOGLE_CALENDAR_API_BASE}/calendars/${calendarId}/events`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create event: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error creating Google Calendar event:', error);
+      throw error;
+    }
+  }
 }
 
 /**
