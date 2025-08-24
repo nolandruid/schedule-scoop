@@ -16,12 +16,17 @@
     "128": "images/calendar128.png"
   },
 
-  "permissions": ["scripting", "storage", "activeTab", "webNavigation"],
+  "permissions": ["scripting", "storage", "activeTab", "webNavigation", "identity"],
 
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["<all_urls>", "https://www.googleapis.com/*"],
 
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; 'unsafe-inline' 'self'"
+  },
+
+  "oauth2":{
+    "client_id": "318919291132-9bacc4qts4elfvecovmdmukovm7th8hf.apps.googleusercontent.com",
+    "scope": ["https://www.googleapis.com/auth/calendar.events"]
   },
   
   "background": {
