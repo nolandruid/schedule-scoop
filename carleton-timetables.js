@@ -471,6 +471,23 @@ async function getCarletonAndPrivacyPolicy() {
                   icsContent += 'END:VCALENDAR';
                   if (count > 0) {
                     totalIcs += icsContent + '\n\n';
+                    totalCount++;               
+                      
+                      // Check selected calendar type and export accordingly
+                      chrome.storage.local.get(['selected-calendar'], (result) => {
+                        const selectedCalendar = result['selected-calendar'] || 'ics';
+                        
+                        if (selectedCalendar === 'google') {
+                          // For Google Calendar, collect events but don't download individual files
+                          // Events will be created in batch after processing all courses
+                        } else if (selectedCalendar === 'outlook') {
+                          // For Outlook Calendar, collect events but don't download individual files
+                          // Events will be created in batch after processing all courses
+                        } else if (selectedCalendar === 'apple') {
+                          // For Apple Calendar, collect events but don't download individual files
+                          // Events will be created in batch after processing all courses
+                        } else {
+                          // Export as ICS file (default for ics and fallback)
                     try {
                       const blob = new Blob([icsContent], { type: 'text/calendar' });
                       const url = URL.createObjectURL(blob);
