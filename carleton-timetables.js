@@ -509,9 +509,24 @@ async function getCarletonAndPrivacyPolicy() {
               });
               const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
               logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, totalIcs]);
-              if (totalCount <= 0) {
-                alert('No classes found\n\nNeuroNest');
-              }
+              
+              // Handle calendar export for individual mode
+              chrome.storage.local.get(['selected-calendar'], (result) => {
+                const selectedCalendar = result['selected-calendar'] || 'ics';
+                
+                if (selectedCalendar === 'google' && processedEvents.length > 0) {
+                  // Create all events in Google Calendar
+                  createGoogleCalendarEvents(processedEvents, 'All Courses');
+                } else if (selectedCalendar === 'outlook' && processedEvents.length > 0) {
+                  // Create all events in Outlook Calendar
+                  createOutlookCalendarEvents(processedEvents, 'All Courses');
+                } else if (selectedCalendar === 'apple' && processedEvents.length > 0) {
+                  // Create all events in Apple Calendar
+                  createAppleCalendarEvents(processedEvents, 'All Courses');
+                } else if (totalCount <= 0) {
+                  alert('No classes found\n\nNeuroNest');
+                }
+              });
             }
           } catch (err) {
             // createICal error
