@@ -17,8 +17,9 @@
   },
 
   "permissions": ["scripting", "storage", "activeTab", "webNavigation", "identity"],
+  
+  "host_permissions": ["<all_urls>", "https://www.googleapis.com/*", "https://graph.microsoft.com/*"],
 
-  "host_permissions": ["<all_urls>", "https://www.googleapis.com/*"],
 
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; 'unsafe-inline' 'self'"
@@ -26,7 +27,7 @@
 
   "oauth2":{
     "client_id": "318919291132-9bacc4qts4elfvecovmdmukovm7th8hf.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
+    "scopes": ["https://www.googleapis.com/auth/calendar.events", "https://graph.microsoft.com/.default"]
   },
   
   "background": {
