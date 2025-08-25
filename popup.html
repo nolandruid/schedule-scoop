@@ -14,17 +14,17 @@
     <div class="logo-details">
       <!-- <img class="logo-image" id="popup-logo-img1" src="images/calendar256.png" alt="calendar_icon"> -->
       <i class='bx bx-calendar logo-image' ></i>
-      <span class="logo-name">Timetable Tools</span>
+      <span class="logo-name">ScheduleScoop</span>
     </div>
     <ul class="nav-links">
       <!-- entry -->
       <li class="">
         <a href="#" class="config-btn" data-school="carleton" data-node="timetable-tool">
-          <i class='bx bxs-download central' style='color:#fff4f4'></i>
-          <span class="link-name">Select term</span>
+          <i class='bx bx-book central' style='color:#fff4f4'></i>
+          <span class="link-name">Select Term</span>
           <div class="config-container" data-school="carleton" data-node="timetable-tool">
             <span class="node-state" data-school="carleton" data-node="timetable-tool">Winter 2025</span>
-            <i class='bx bxs-cog' style='color:#fff4f4'></i>
+            <!-- <i class='bx bxs-cog' style='color:#fff4f4'></i> -->
           </div>
         </a>
       </li>
@@ -32,7 +32,7 @@
 
         <div class="node" id="timetable-tool">
           <a href="#">
-            <i class='bx bxs-download central' style='color:#fff4f4'  ></i>
+            <i class='bx bx-calendar-exclamation central' style='color:#fff4f4'  ></i>
             <span class="link-name">Select Calendar</span>
           </a>
             <i class="bx bxs-chevron-down arrow central"></i>
@@ -67,17 +67,20 @@
 
       <!-- Export Button -->
       <li class="export-button-container">
-        <button class="export-btn selector carleton require-opened-cu" data-school="carleton" data-url="https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd" data-calendar="https://central.carleton.ca/prod/bwskfshd.P_CrseSchd" data-timetables="https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl" data-injection="carleton-timetables.js">
-          <i class='bx bxs-download' style='color:#ffffff'></i>
-          <span>Export</span>
+        <button class="export-btn selector carleton require-opened-cu" data-school="carleton" data-url="https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd" data-calendar="https://central.carleton.ca/prod/bwskfshd.P_CrseSchd" data-timetables="https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl" data-injection="carleton-timetables.js" style="font-size: 1.2em;">
+          <i class='bx bxs-download' style='color:#ffffff; font-size: 1.2em;'></i>
+          <span style="font-size: 1.2em;">Export</span>
         </button>
       </li>
 
       <div class="socials">
-        <a class="github-link social-icon" href="https://github.com/DerekY2/timetable-tools" target="_blank">
+        <a class="github-link social-icon" href="https://github.com/nolandruid/schedule-scoop" target="_blank">
           <i class='bx bxl-github' style='color:#ffffff' ></i>
         </a>
-        <a href="https://www.linkedin.com/in/derek-yu-53273130b/" class="linkedin-link social-icon" target="_blank">
+        <a href="https://www.linkedin.com/in/nolandruid/" class="linkedin-link social-icon" target="_blank">
+          <i class='bx bxl-linkedin-square' style='color:#ffffff' ></i>
+        </a>
+        <a href="https://www.linkedin.com/in/siddig-ahmed-aa1757329/" class="linkedin-link social-icon" target="_blank">
           <i class='bx bxl-linkedin-square' style='color:#ffffff' ></i>
         </a>
         <a class="social-icon test" target="_blank" href="https://www.buymeacoffee.com/yawndeer">
@@ -111,7 +114,7 @@
       <div class="timetable config-content">
         <select id="school-select" name="school" class="select-school dropdown-config-select" data-node="timetable-tool">
           <option value="carleton">Carleton</option>
-          <!-- <option value="ottawa">Ottawa</option>
+          <!-- <option value="ottawa">UOttawa</option>
           <option value="waterloo">Waterloo</option> -->
         </select>
 
@@ -121,14 +124,15 @@
           <option value="30">Fall</option>
         </select>
         <select id="year-select" name="year">
+          <option value="2026">2026</option>
           <option value="2025">2025</option>
-          <option value="2024">2024</option>
+          <!-- <option value="2024">2024</option>
           <option value="2023">2023</option>
           <option value="2022">2022</option>
           <option value="2021">2021</option>
           <option value="2020">2020</option>
           <option value="2019">2019</option>
-          <option value="2018">2018</option>
+          <option value="2018">2018</option> -->
           <!-- Add more options as needed -->
         </select>
       </div>
