@@ -345,6 +345,7 @@ async function getCarletonAndPrivacyPolicy() {
               let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
               let count = 0;
               let allCourses = '';
+              let processedEvents = [];
               timetable.forEach(node => {
                 try {
                   if (!node || !node.daysOfTheWeek) return;
