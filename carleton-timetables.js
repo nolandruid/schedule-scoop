@@ -356,7 +356,7 @@ async function getCarletonAndPrivacyPolicy() {
                   const startMinute = parseInt(startTime[1], 10);
                   const endHour = parseInt(endTime[0], 10);
                   const endMinute = parseInt(endTime[1], 10);
-                  const timeNoSpace = node.classStartTime.replace(/\s/g, '');
+                  const timeNoSpace = node.classStartTime.replace(/\s/g,'');
                   const timeNoSpace2 = node.classEndTime.replace(/\s/g, '');
                   // Create separate events for each day
                   node.daysOfTheWeek.split('').forEach(day => {
@@ -373,6 +373,27 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
+                      //Store processed event data for Google Calendar
+                      processedEvents.push({
+                        const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
+                        allCourses += courseInfo;
+                        
+                        // Store processed event data for Google Calendar
+                        processedEvents.push({
+                          summary: `${node.courseCode}-${node.courseSection}`,
+                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}\n${node.instructor}\n${node.crn}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}`,
+                          location: node.location || 'Location: N/A',
+                          start: {
+                            dateTime: startDate.toISOString(),
+                            timeZone: 'America/Toronto'
+                          },
+                          end: {
+                            dateTime: endDate.toISOString(),
+                            timeZone: 'America/Toronto'
+                          },
+                          recurrence: [`RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`]
+                        });                  
+                            
                       icsContent += 'BEGIN:VEVENT\n';
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
