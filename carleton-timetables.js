@@ -346,7 +346,6 @@ async function getCarletonAndPrivacyPolicy() {
               timetable.forEach(node => {
                 try {
                   if (!node || !node.daysOfTheWeek) return;
-                  node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
                   const startTime = node.classStartTime == 'N/A' ? 'none' : convertTo24Hour(node.classStartTime).split(':');
                   const endTime = node.classEndTime == 'N/A' ? 'none' : convertTo24Hour(node.classEndTime).split(':');
@@ -356,34 +355,36 @@ async function getCarletonAndPrivacyPolicy() {
                   const endMinute = parseInt(endTime[1], 10);
                   const timeNoSpace = node.classStartTime.replace(/\s/g, '');
                   const timeNoSpace2 = node.classEndTime.replace(/\s/g, '');
-                  let dayList = [];
+                  // Create separate events for each day
                   node.daysOfTheWeek.split('').forEach(day => {
                     const dayOfWeek = daysMap[day];
-                    dayList.push(dayOfWeek);
+                    if (dayOfWeek && startTime != 'none') {
+                      // Adjust start date to this specific day
+                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day);
+                      const startDate = new Date(adjustedStartDate);
+                      const endDate = new Date(adjustedStartDate);
+                      const untilDate = new Date(node.endDate);
+                      untilDate.setDate(untilDate.getDate() + 1);
+                      startDate.setUTCHours(startHour, startMinute, 0, 0);
+                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      
+                      const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
+                      allCourses += courseInfo;
+                      icsContent += 'BEGIN:VEVENT\n';
+                      icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
+                      icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
+                      icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
+                      icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
+                      icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
+                      icsContent += `LOCATION:${node.location}\n`;
+                      icsContent += 'END:VEVENT\n';
+                      count++;
+                    }
                   });
-                  if (dayList.length > 0 && startTime != 'none') {
-                    const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
-                    const startDate = new Date(node.startDate);
-                    const endDate = new Date(node.startDate);
-                    const untilDate = new Date(node.endDate);
-                    untilDate.setDate(untilDate.getDate() + 1);
-                    startDate.setUTCHours(startHour, startMinute, 0, 0);
-                    endDate.setUTCHours(endHour, endMinute, 0, 0);
-                    allCourses += courseInfo;
-                    icsContent += 'BEGIN:VEVENT\n';
-                    icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
-                    icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
-                    icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayList.join(',')};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
-                    icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
-                    icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
-                    icsContent += `LOCATION:${node.location}\n`;
-                    icsContent += 'END:VEVENT\n';
-                                      count++;
+                } catch (err) {
+                  // Error creating iCal event
                 }
-              } catch (err) {
-                // Error creating iCal event
-              }
-            });
+              });
               icsContent += 'END:VCALENDAR';
               if (count > 0) {
                 try {
@@ -414,7 +415,6 @@ async function getCarletonAndPrivacyPolicy() {
                   let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
                   let count = 0;
                   if (!node || !node.daysOfTheWeek) return;
-                  node.startDate = adjustStartDateToDay(new Date(node.startDate), node.daysOfTheWeek);
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
                   const startTime = node.classStartTime == 'N/A' ? 'none' : convertTo24Hour(node.classStartTime).split(':');
                   const endTime = node.classEndTime == 'N/A' ? 'none' : convertTo24Hour(node.classEndTime).split(':');
@@ -424,31 +424,33 @@ async function getCarletonAndPrivacyPolicy() {
                   const endMinute = parseInt(endTime[1], 10);
                   const timeNoSpace = node.classStartTime.replace(/\s/g, '');
                   const timeNoSpace2 = node.classEndTime.replace(/\s/g, '');
-                  let dayList = [];
+                  // Create separate events for each day
                   node.daysOfTheWeek.split('').forEach(day => {
                     const dayOfWeek = daysMap[day];
-                    dayList.push(dayOfWeek);
+                    if (dayOfWeek && startTime != 'none') {
+                      // Adjust start date to this specific day
+                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day);
+                      const startDate = new Date(adjustedStartDate);
+                      const endDate = new Date(adjustedStartDate);
+                      const untilDate = new Date(node.endDate);
+                      untilDate.setDate(untilDate.getDate() + 1);
+                      startDate.setUTCHours(startHour, startMinute, 0, 0);
+                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      
+                      const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
+                      allCourses += courseInfo;
+                      icsContent += 'BEGIN:VEVENT\n';
+                      icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
+                      icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
+                      icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
+                      icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
+                      icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
+                      icsContent += `LOCATION:${node.location}\n`;
+                      icsContent += 'END:VEVENT\n';
+                      count++;
+                      totalCount++;
+                    }
                   });
-                  if (dayList.length > 0 && startTime != 'none') {
-                    const startDate = new Date(node.startDate);
-                    const endDate = new Date(node.startDate);
-                    const untilDate = new Date(node.endDate);
-                    untilDate.setDate(untilDate.getDate() + 1);
-                    startDate.setUTCHours(startHour, startMinute, 0, 0);
-                    endDate.setUTCHours(endHour, endMinute, 0, 0);
-                    const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
-                    allCourses += courseInfo;
-                    icsContent += 'BEGIN:VEVENT\n';
-                    icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
-                    icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
-                    icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayList.join(',')};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
-                    icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
-                    icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
-                    icsContent += `LOCATION:${node.location}\n`;
-                    icsContent += 'END:VEVENT\n';
-                    count++;
-                    totalCount++;
-                  }
                   icsContent += 'END:VCALENDAR';
                   if (count > 0) {
                     totalIcs += icsContent + '\n\n';
@@ -489,11 +491,12 @@ async function getCarletonAndPrivacyPolicy() {
          * @param {string} daysOfTheWeek - String containing day codes (M, T, W, R, F)
          * @returns {Date} Adjusted date that falls on the first specified day
          */
-        const adjustStartDateToDay = (startDate, daysOfTheWeek) => {
+        const adjustStartDateToDay = (startDate, dayCode) => {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
-            if (!daysOfTheWeek || daysOfTheWeek.length === 0) return startDate;
-            const dayOfWeek = daysMap[daysOfTheWeek[0]];
+            if (!dayCode || dayCode.length === 0) return startDate;
+            
+            const dayOfWeek = daysMap[dayCode];
             const currentDay = startDate.getDay();
             let diff = dayOfWeek - currentDay;
             if (diff < 0) diff += 7;
