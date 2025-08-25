@@ -340,7 +340,7 @@ async function getCarletonAndPrivacyPolicy() {
               return;
             }
             if (exportCombined) {
-              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
+              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
               let count = 0;
               let allCourses = '';
               timetable.forEach(node => {
@@ -370,7 +370,10 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
+                      const eventUid = `${node.courseCode}-${node.courseSection}-${day}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@carleton.ca`;
                       icsContent += 'BEGIN:VEVENT\n';
+                      icsContent += `UID:${eventUid}\n`;
+                      icsContent += `DTSTAMP:${formatDateUTC(new Date())}\n`;
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
                       icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
@@ -412,7 +415,7 @@ async function getCarletonAndPrivacyPolicy() {
               let allCourses = '';
               timetable.forEach(node => {
                 try {
-                  let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
+                  let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
                   let count = 0;
                   if (!node || !node.daysOfTheWeek) return;
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
@@ -439,7 +442,10 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
+                      const eventUid = `${node.courseCode}-${node.courseSection}-${day}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@carleton.ca`;
                       icsContent += 'BEGIN:VEVENT\n';
+                      icsContent += `UID:${eventUid}\n`;
+                      icsContent += `DTSTAMP:${formatDateUTC(new Date())}\n`;
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
                       icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
