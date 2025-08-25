@@ -253,6 +253,22 @@ async function getCarletonAndPrivacyPolicy() {
           userInfo3 = 'Unknown User';
         }
 
+        /**
+         * Extracts content from a specific table row
+         * @param {HTMLTableElement} table - The table element to search in
+         * @param {number} rowIndex - The row index to extract content from (1-based)
+         * @returns {string} The text content of the row, or 'N/A' if not found
+         */
+        const getRowContent = (table, rowIndex) => {
+          try {
+            const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
+            return !(row == '') ? row.textContent.trim() : 'N/A';
+          } catch (err) {
+            // getRowContent error
+            return 'N/A';
+          }
+        }
+
         document.querySelectorAll('table.datadisplaytable').forEach((table, index) => {
           try {
             const section = {};
@@ -279,7 +295,9 @@ async function getCarletonAndPrivacyPolicy() {
               section.courseSection = courseSection;
               section.crn = crn;
               section.instructor = instructor.trim() ? instructor.trim() : 'Instructor: N/A';
-              tables[index / 2] = section;
+              const targetIndex = Math.floor(index / 2);
+              if (!tables[targetIndex]) tables[targetIndex] = {};
+              Object.assign(tables[targetIndex], section);
               log.push(meta);
             } else {
               const row = table.querySelector('tr:nth-of-type(2)');
@@ -314,22 +332,6 @@ async function getCarletonAndPrivacyPolicy() {
         const timetable = tables;
 
         /**
-         * Extracts content from a specific table row
-         * @param {HTMLTableElement} table - The table element to search in
-         * @param {number} rowIndex - The row index to extract content from (1-based)
-         * @returns {string} The text content of the row, or 'N/A' if not found
-         */
-        const getRowContent = (table, rowIndex) => {
-          try {
-            const row = table.querySelector(`tr:nth-of-type(${rowIndex}) td`);
-            return !(row == '') ? row.textContent.trim() : 'N/A';
-          } catch (err) {
-            // getRowContent error
-            return 'N/A';
-          }
-        }
-
-        /**
          * Creates iCalendar (.ics) files from timetable data
          * @param {Array<Object>} timetable - Array of course objects containing schedule information
          */
@@ -340,7 +342,7 @@ async function getCarletonAndPrivacyPolicy() {
               return;
             }
             if (exportCombined) {
-              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//ScheduleScoop//CU_Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
+              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\n';
               let count = 0;
               let allCourses = '';
               timetable.forEach(node => {
@@ -370,10 +372,7 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
-                      const eventUid = `${node.courseCode}-${node.courseSection}-${day}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@carleton.ca`;
                       icsContent += 'BEGIN:VEVENT\n';
-                      icsContent += `UID:${eventUid}\n`;
-                      icsContent += `DTSTAMP:${formatDateUTC(new Date())}\n`;
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
                       icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
@@ -415,7 +414,7 @@ async function getCarletonAndPrivacyPolicy() {
               let allCourses = '';
               timetable.forEach(node => {
                 try {
-                  let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
+                  let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
                   let count = 0;
                   if (!node || !node.daysOfTheWeek) return;
                   const daysMap = { 'M': 'MO', 'T': 'TU', 'W': 'WE', 'R': 'TH', 'F': 'FR' };
@@ -442,10 +441,7 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
-                      const eventUid = `${node.courseCode}-${node.courseSection}-${day}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@carleton.ca`;
                       icsContent += 'BEGIN:VEVENT\n';
-                      icsContent += `UID:${eventUid}\n`;
-                      icsContent += `DTSTAMP:${formatDateUTC(new Date())}\n`;
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
                       icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
