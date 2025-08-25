@@ -389,6 +389,21 @@ async function getCarletonAndPrivacyPolicy() {
               });
               icsContent += 'END:VCALENDAR';
               if (count > 0) {
+                // Check selected calendar type and export accordingly
+                chrome.storage.local.get(['selected-calendar'], (result) => {
+                    const selectedCalendar = result['selected-calendar'] || 'ics';
+                    
+                    if (selectedCalendar === 'google') {
+                      // Export to Google Calendar
+                      createGoogleCalendarEvents(processedEvents, userInfo2);
+                    } else if (selectedCalendar === 'outlook') {
+                      // Export to Outlook Calendar
+                      createOutlookCalendarEvents(processedEvents, userInfo2);
+                    } else if (selectedCalendar === 'apple') {
+                      // Export to Apple Calendar via CalDAV
+                      createAppleCalendarEvents(processedEvents, userInfo2);
+                    } else {
+                      // Export as ICS file (default for ics and fallback)
                 try {
                   const blob = new Blob([icsContent], { type: 'text/calendar' });
                   const url = URL.createObjectURL(blob);
