@@ -340,7 +340,7 @@ async function getCarletonAndPrivacyPolicy() {
               return;
             }
             if (exportCombined) {
-              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//CU_Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
+              let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//ScheduleScoop//CU_Timetable//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n';
               let count = 0;
               let allCourses = '';
               timetable.forEach(node => {
