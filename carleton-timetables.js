@@ -439,7 +439,7 @@ async function getCarletonAndPrivacyPolicy() {
                 alert('Nothing to see here...\n\nNeuroNest');
               }
             } else {
-              let totalCount = 0;
+             /*let totalCount = 0;
               let totalIcs = '';
               let allCourses = '';
               let processedEvents = []; // Array to collect events for Google Calendar
@@ -562,12 +562,15 @@ async function getCarletonAndPrivacyPolicy() {
                   alert('No classes found\n\nNeuroNest');
                 }
               });
-            }
-          } catch (err) {
+            }*/
+
+           // Individual export mode disabled - only combined export supported
+           alert('Individual course export is currently disabled. Please use combined export mode.\n\nTimetable Tools');
+           return;
+          } /*catch (err) {
             // createICal error
             alert('Failed to generate calendar file.\n\nNeuroNest');
-          }
-        }
+        }}*/
 
         /**
          * Adjusts a start date to match the first occurrence of specified days of the week
@@ -642,7 +645,7 @@ async function getCarletonAndPrivacyPolicy() {
             // formatDateLocal error
             return '';
           }
-        }
+        };
 
         /**
          * Formats a Date object for iCalendar UTC time format
@@ -656,7 +659,7 @@ async function getCarletonAndPrivacyPolicy() {
             // formatDateUTC error
             return '';
           }
-        }
+        };
 
         /**
          * Converts 12-hour time format to 24-hour format
