@@ -851,6 +851,22 @@ async function getCarletonAndPrivacyPolicy() {
   }
 
   /**
+   * Gets Outlook Calendar OAuth token using message passing to popup script
+   * @returns {Promise<string>} OAuth access token
+   */
+  async function getOutlookCalendarToken() {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: 'getOutlookCalendarToken' }, (response) => {
+        if (response && response.success) {
+          resolve(response.token);
+        } else {
+          reject(new Error(`Authentication failed: ${response?.error?.message || 'Unknown error'}`));
+        }
+      });
+    });
+  }
+
+  /**
    * Creates events in Google Calendar using the Calendar API
    * @param {Array} events - Array of event objects to create
    * @param {string} calendarName - Name for the calendar (used in success message)
@@ -902,50 +918,6 @@ async function getCarletonAndPrivacyPolicy() {
       console.error('Google Calendar integration error:', error);
       alert(`Failed to connect to Google Calendar: ${error.message}`);
     }
-  }
-
-  /**
-   * Gets Outlook Calendar OAuth token using Microsoft Graph API
-   * @returns {Promise<string>} OAuth access token
-   */
-  async function getOutlookCalendarToken() {
-    return new Promise((resolve, reject) => {
-      const clientId = '4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4';
-      const redirectUri = chrome.runtime.getURL('');
-      const scope = 'https://graph.microsoft.com/calendars.readwrite';
-      
-      const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
-        `client_id=${clientId}&` +
-        `response_type=token&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `scope=${encodeURIComponent(scope)}&` +
-        `response_mode=fragment`;
-
-      chrome.identity.launchWebAuthFlow({
-        url: authUrl,
-        interactive: true
-      }, (responseUrl) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
-          return;
-        }
-        
-        if (!responseUrl) {
-          reject(new Error('Authentication cancelled by user'));
-          return;
-        }
-        
-        // Extract access token from URL fragment
-        const urlParams = new URLSearchParams(responseUrl.split('#')[1]);
-        const accessToken = urlParams.get('access_token');
-        
-        if (accessToken) {
-          resolve(accessToken);
-        } else {
-          reject(new Error('Failed to extract access token from response'));
-        }
-      });
-    });
   }
 
   /**
