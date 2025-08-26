@@ -373,10 +373,6 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
-                      //Store processed event data for Google Calendar
-                      processedEvents.push({
-                        const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
-                        allCourses += courseInfo;
                         
                         // Store processed event data for Google Calendar
                         processedEvents.push({
@@ -426,29 +422,33 @@ async function getCarletonAndPrivacyPolicy() {
                       createAppleCalendarEvents(processedEvents, userInfo2);
                     } else {
                       // Export as ICS file (default for ics and fallback)
-                try {
-                  const blob = new Blob([icsContent], { type: 'text/calendar' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = userInfo2 + '.ics';
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-                } catch (err) {
-                  // Error downloading iCal
-                  alert('Failed to download calendar file.\n\nNeuroNest');
-                }
+                      try {
+                        const blob = new Blob([icsContent], { type: 'text/calendar' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = userInfo2 + '.ics';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      } catch (err) {
+                        // Error downloading iCal
+                        alert('Failed to download calendar file.\n\nNeuroNest');
+                      }
+                    }
+                    
+                    const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
+                    logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]);
+                });
               } else {
                 alert('Nothing to see here...\n\nNeuroNest');
               }
-              const currentDate = new Date().toLocaleString('en-US', { timeZone: 'America/Toronto', hour12: false });
-              logCalendar([userInfo3, currentDate, 'carleton', userInfo2, allCourses, icsContent]);
             } else {
               let totalCount = 0;
               let totalIcs = '';
               let allCourses = '';
+              let processedEvents = []; // Array to collect events for Google Calendar
               timetable.forEach(node => {
                 try {
                   let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NeuroNest//Timetable//EN\n';
@@ -478,6 +478,23 @@ async function getCarletonAndPrivacyPolicy() {
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
+                      
+                      // Store processed event data for Google Calendar
+                      processedEvents.push({
+                        summary: `${node.courseCode}-${node.courseSection}`,
+                        description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}\n${node.instructor}\n${node.crn}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}`,
+                        location: node.location || 'Location: N/A',
+                        start: {
+                          dateTime: startDate.toISOString(),
+                          timeZone: 'America/Toronto'
+                        },
+                        end: {
+                          dateTime: endDate.toISOString(),
+                          timeZone: 'America/Toronto'
+                        },
+                        recurrence: [`RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`]
+                      });
+                      
                       icsContent += 'BEGIN:VEVENT\n';
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
@@ -510,20 +527,22 @@ async function getCarletonAndPrivacyPolicy() {
                           // Events will be created in batch after processing all courses
                         } else {
                           // Export as ICS file (default for ics and fallback)
-                    try {
-                      const blob = new Blob([icsContent], { type: 'text/calendar' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `${node.courseCode}-${node.courseSection}` + '.ics';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                    } catch (err) {
-                      // Error downloading iCal
-                      alert('Failed to download calendar file.\n\nNeuroNest');
-                    }
+                          try {
+                            const blob = new Blob([icsContent], { type: 'text/calendar' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${node.courseCode}-${node.courseSection}` + '.ics';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          } catch (err) {
+                            // Error downloading iCal
+                            alert('Failed to download calendar file.\n\nNeuroNest');
+                          }
+                        }
+                      });
                   }
                 } catch (err) {
                   // Error creating iCal event
@@ -738,76 +757,74 @@ async function getCarletonAndPrivacyPolicy() {
     }
   }
 
-}
-
-/**
- * Gets Google Calendar OAuth token using Chrome identity API
- * @returns {Promise<string>} OAuth access token
- */
-async function getGoogleCalendarToken() {
-  return new Promise((resolve, reject) => {
-    chrome.identity.getAuthToken({ interactive: true }, (token) => {
-      if (chrome.runtime.lastError) {
-        reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
-      } else {
-        resolve(token);
-      }
-    });
-  });
-}
-
-/**
- * Creates events in Google Calendar using the Calendar API
- * @param {Array} events - Array of event objects to create
- * @param {string} calendarName - Name for the calendar (used in success message)
- */
-async function createGoogleCalendarEvents(events, calendarName) {
-  try {
-    const token = await getGoogleCalendarToken();
-    let successCount = 0;
-    let errorCount = 0;
-    
-    // Create events sequentially to avoid rate limiting
-    for (const event of events) {
-      try {
-        const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(event)
-        });
-        
-        if (response.ok) {
-          successCount++;
+  /**
+   * Gets Google Calendar OAuth token using Chrome identity API
+   * @returns {Promise<string>} OAuth access token
+   */
+  async function getGoogleCalendarToken() {
+    return new Promise((resolve, reject) => {
+      chrome.identity.getAuthToken({ interactive: true }, (token) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
         } else {
-          console.error('Failed to create event:', await response.text());
+          resolve(token);
+        }
+      });
+    });
+  }
+
+  /**
+   * Creates events in Google Calendar using the Calendar API
+   * @param {Array} events - Array of event objects to create
+   * @param {string} calendarName - Name for the calendar (used in success message)
+   */
+  async function createGoogleCalendarEvents(events, calendarName) {
+    try {
+      const token = await getGoogleCalendarToken();
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // Create events sequentially to avoid rate limiting
+      for (const event of events) {
+        try {
+          const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(event)
+          });
+          
+          if (response.ok) {
+            successCount++;
+          } else {
+            console.error('Failed to create event:', await response.text());
+            errorCount++;
+          }
+        } catch (eventError) {
+          console.error('Error creating individual event:', eventError);
           errorCount++;
         }
-      } catch (eventError) {
-        console.error('Error creating individual event:', eventError);
-        errorCount++;
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Show success/error message
+      if (successCount > 0) {
+        const message = errorCount > 0 
+          ? `Successfully created ${successCount} events in Google Calendar. ${errorCount} events failed to create.`
+          : `Successfully created ${successCount} events in Google Calendar!`;
+        alert(message);
+      } else {
+        alert('Failed to create any events in Google Calendar. Please try again.');
+      }
+      
+    } catch (error) {
+      console.error('Google Calendar integration error:', error);
+      alert(`Failed to connect to Google Calendar: ${error.message}`);
     }
-    
-    // Show success/error message
-    if (successCount > 0) {
-      const message = errorCount > 0 
-        ? `Successfully created ${successCount} events in Google Calendar. ${errorCount} events failed to create.`
-        : `Successfully created ${successCount} events in Google Calendar!`;
-      alert(message);
-    } else {
-      alert('Failed to create any events in Google Calendar. Please try again.');
-    }
-    
-  } catch (error) {
-    console.error('Google Calendar integration error:', error);
-    alert(`Failed to connect to Google Calendar: ${error.message}`);
   }
-}
 
 })();
