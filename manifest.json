@@ -29,6 +29,12 @@
     "client_id": "318919291132-9bacc4qts4elfvecovmdmukovm7th8hf.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar.events"]
   },
+
+
+"microsoft_oauth2": {
+  "client_id": "4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4",
+  "scopes": ["https://graph.microsoft.com/calendars.readwrite"]
+},
   
   "background": {
       "service_worker": "background.js"
