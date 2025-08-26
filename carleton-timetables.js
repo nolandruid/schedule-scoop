@@ -28,7 +28,7 @@ async function getCarletonAndPrivacyPolicy() {
   } catch (err) {
     alert('Failed to load settings. Please try again.\n\nNeuroNest');
     chrome.runtime.sendMessage({action:'end-timetable-request'});
-    chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+    // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
     return;
   }
 
@@ -46,7 +46,7 @@ async function getCarletonAndPrivacyPolicy() {
     // Error processing results
     alert('Error processing settings.\n\nNeuroNest');
     chrome.runtime.sendMessage({action:'end-timetable-request'});
-    chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+    // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
     return;
   }
 
@@ -107,23 +107,23 @@ async function getCarletonAndPrivacyPolicy() {
           } else {
             alert(`Request failed: Term [${mapTerm(r)}] Not Found\n\nTimetable Tools`);
             chrome.runtime.sendMessage({action:'end-timetable-request'});
-            chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+            // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
           }
         } catch (err) {
           // Error in Registration Term
           alert('Error selecting term.\n\nNeuroNest');
           chrome.runtime.sendMessage({action:'end-timetable-request'});
-          chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+          // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
         }
       }).catch(err => {
         // waitForElm error
         alert('Failed to find term selector.\n\nNeuroNest');
         chrome.runtime.sendMessage({action:'end-timetable-request'});
-        chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+        // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
       });
     }
     else if (document.title.trim() == 'Student Detail Schedule') {
-      chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempLoginCU'});
+      // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempLoginCU'});
       waitForElm(bigFatHeader).then((elm) => {
         try {
           run();
@@ -131,13 +131,13 @@ async function getCarletonAndPrivacyPolicy() {
           // Error running timetable extraction
           alert('Failed to process timetable.\n\nNeuroNest');
           chrome.runtime.sendMessage({action:'end-timetable-request'});
-          chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+          // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
         }
       }).catch(err => {
         // waitForElm error
         alert('Failed to find timetable header.\n\nNeuroNest');
         chrome.runtime.sendMessage({action:'end-timetable-request'});
-        chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+        // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
       });
     }
     else {
@@ -147,7 +147,7 @@ async function getCarletonAndPrivacyPolicy() {
     // Unhandled error in main navigation
     alert('Unexpected error occurred.\n\nNeuroNest');
     chrome.runtime.sendMessage({action:'end-timetable-request'});
-    chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
+    // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'});
   }
 
   /**
@@ -684,17 +684,17 @@ async function getCarletonAndPrivacyPolicy() {
 
         createICal(timetable);
         chrome.runtime.sendMessage({ action: 'end-timetable-request' });
-        chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
+        // chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
       } else {
         alert("ERROR: Privacy Policy Agreement not found, aborting!\n\n NeuroNest");
         chrome.runtime.sendMessage({ action: 'end-timetable-request' });
-        chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
+        // chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
       }
     } catch (err) {
       // run() error
       alert('Unexpected error during timetable processing.\n\nNeuroNest');
       chrome.runtime.sendMessage({ action: 'end-timetable-request' });
-      chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
+      // chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
     }
   }
 
@@ -758,16 +758,16 @@ async function getCarletonAndPrivacyPolicy() {
   }
 
   /**
-   * Gets Google Calendar OAuth token using Chrome identity API
+   * Gets Google Calendar OAuth token using message passing to background script
    * @returns {Promise<string>} OAuth access token
    */
   async function getGoogleCalendarToken() {
     return new Promise((resolve, reject) => {
-      chrome.identity.getAuthToken({ interactive: true }, (token) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
+      chrome.runtime.sendMessage({ action: 'getGoogleCalendarToken' }, (response) => {
+        if (response && response.success) {
+          resolve(response.token);
         } else {
-          resolve(token);
+          reject(new Error(`Authentication failed: ${response?.error?.message || 'Unknown error'}`));
         }
       });
     });
