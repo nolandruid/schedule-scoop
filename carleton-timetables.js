@@ -439,7 +439,7 @@ async function getCarletonAndPrivacyPolicy() {
                 alert('Nothing to see here...\n\nNeuroNest');
               }
             } else {
-             /*let totalCount = 0;
+              /*let totalCount = 0;
               let totalIcs = '';
               let allCourses = '';
               let processedEvents = []; // Array to collect events for Google Calendar
@@ -561,16 +561,16 @@ async function getCarletonAndPrivacyPolicy() {
                 } else if (totalCount <= 0) {
                   alert('No classes found\n\nNeuroNest');
                 }
-              });
-            }*/
-
-           // Individual export mode disabled - only combined export supported
+              });*/
+              // Individual export mode disabled - only combined export supported
            alert('Individual course export is currently disabled. Please use combined export mode.\n\nTimetable Tools');
            return;
-          } /*catch (err) {
+            }
+          }catch (err) {
             // createICal error
             alert('Failed to generate calendar file.\n\nNeuroNest');
-        }}*/
+          }
+        }
 
         /**
          * Adjusts a start date to match the first occurrence of specified days of the week
@@ -784,54 +784,71 @@ async function getCarletonAndPrivacyPolicy() {
   function convertToOutlookFormat(neutralEvent) {
     // Parse recurrence rule to extract components
     let recurrencePattern = null;
-    const rrule = neutralEvent.recurrenceRule;
-    const dayMatch = rrule.match(/BYDAY=([^;]+)/);
-    const untilMatch = rrule.match(/UNTIL=([^;]+)/);
     
-    if (dayMatch && untilMatch) {
-      // Map day codes from RRULE to Outlook format
-      const dayMapping = {
-        'MO': 'monday',
-        'TU': 'tuesday', 
-        'WE': 'wednesday',
-        'TH': 'thursday',
-        'FR': 'friday'
-      };
+    if (neutralEvent.recurrenceRule) {
+      const rrule = neutralEvent.recurrenceRule;
+      const dayMatch = rrule.match(/BYDAY=([^;]+)/);
+      const untilMatch = rrule.match(/UNTIL=([^;]+)/);
       
-      const days = dayMatch[1].split(',').map(day => dayMapping[day]).filter(Boolean);
-      const until = new Date(untilMatch[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z'));
-      
-      recurrencePattern = {
-        type: 'weekly',
-        interval: 1,
-        daysOfWeek: days,
-        range: {
-          type: 'endDate',
-          startDate: neutralEvent.startDateTime.toISOString().split('T')[0],
-          endDate: until.toISOString().split('T')[0]
+      if (dayMatch && untilMatch) {
+        // Map day codes from RRULE to Outlook format
+        const dayMapping = {
+          'MO': 'monday',
+          'TU': 'tuesday', 
+          'WE': 'wednesday',
+          'TH': 'thursday',
+          'FR': 'friday'
+        };
+        
+        const days = dayMatch[1].split(',').map(day => dayMapping[day]).filter(Boolean);
+        const until = new Date(untilMatch[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z'));
+        
+        if (days.length > 0) {
+          recurrencePattern = {
+            pattern: {
+              type: 'weekly',
+              interval: 1,
+              daysOfWeek: days
+            },
+            range: {
+              type: 'endDate',
+              startDate: neutralEvent.startDateTime.toISOString().split('T')[0],
+              endDate: until.toISOString().split('T')[0]
+            }
+          };
         }
-      };
+      }
     }
 
-    return {
-      subject: neutralEvent.title,
+    const outlookEvent = {
+      subject: neutralEvent.title || 'Untitled Event',
       body: {
         contentType: 'text',
-        content: neutralEvent.description
+        content: neutralEvent.description || ''
       },
       start: {
         dateTime: neutralEvent.startDateTime.toISOString(),
-        timeZone: neutralEvent.timezone
+        timeZone: neutralEvent.timezone || 'America/Toronto'
       },
       end: {
         dateTime: neutralEvent.endDateTime.toISOString(),
-        timeZone: neutralEvent.timezone
-      },
-      location: {
-        displayName: neutralEvent.location
-      },
-      recurrence: recurrencePattern
+        timeZone: neutralEvent.timezone || 'America/Toronto'
+      }
     };
+
+    // Only add location if it exists and is not empty
+    if (neutralEvent.location && neutralEvent.location.trim()) {
+      outlookEvent.location = {
+        displayName: neutralEvent.location
+      };
+    }
+
+    // Only add recurrence if it was successfully parsed
+    if (recurrencePattern) {
+      outlookEvent.recurrence = recurrencePattern;
+    }
+
+    return outlookEvent;
   }
 
   /**
@@ -841,6 +858,22 @@ async function getCarletonAndPrivacyPolicy() {
   async function getGoogleCalendarToken() {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ action: 'getGoogleCalendarToken' }, (response) => {
+        if (response && response.success) {
+          resolve(response.token);
+        } else {
+          reject(new Error(`Authentication failed: ${response?.error?.message || 'Unknown error'}`));
+        }
+      });
+    });
+  }
+
+  /**
+   * Gets Outlook Calendar OAuth token using message passing to popup script
+   * @returns {Promise<string>} OAuth access token
+   */
+  async function getOutlookCalendarToken() {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: 'getOutlookCalendarToken' }, (response) => {
         if (response && response.success) {
           resolve(response.token);
         } else {
@@ -905,50 +938,6 @@ async function getCarletonAndPrivacyPolicy() {
   }
 
   /**
-   * Gets Outlook Calendar OAuth token using Microsoft Graph API
-   * @returns {Promise<string>} OAuth access token
-   */
-  async function getOutlookCalendarToken() {
-    return new Promise((resolve, reject) => {
-      const clientId = '4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4';
-      const redirectUri = chrome.runtime.getURL('');
-      const scope = 'https://graph.microsoft.com/calendars.readwrite';
-      
-      const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
-        `client_id=${clientId}&` +
-        `response_type=token&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `scope=${encodeURIComponent(scope)}&` +
-        `response_mode=fragment`;
-
-      chrome.identity.launchWebAuthFlow({
-        url: authUrl,
-        interactive: true
-      }, (responseUrl) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
-          return;
-        }
-        
-        if (!responseUrl) {
-          reject(new Error('Authentication cancelled by user'));
-          return;
-        }
-        
-        // Extract access token from URL fragment
-        const urlParams = new URLSearchParams(responseUrl.split('#')[1]);
-        const accessToken = urlParams.get('access_token');
-        
-        if (accessToken) {
-          resolve(accessToken);
-        } else {
-          reject(new Error('Failed to extract access token from response'));
-        }
-      });
-    });
-  }
-
-  /**
    * Creates events in Outlook Calendar using the Microsoft Graph API
    * @param {Array} events - Array of event objects to create
    * @param {string} calendarName - Name for the calendar (used in success message)
@@ -962,23 +951,31 @@ async function getCarletonAndPrivacyPolicy() {
       // Create events sequentially to avoid rate limiting
       for (const event of events) {
         try {
+          const outlookEvent = convertToOutlookFormat(event);
+          console.log('Creating Outlook event:', outlookEvent);
+          
           const response = await fetch('https://graph.microsoft.com/v1.0/me/events', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(convertToOutlookFormat(event))
+            body: JSON.stringify(outlookEvent)
           });
           
           if (response.ok) {
+            const result = await response.json();
+            console.log('Event created successfully:', result.id);
             successCount++;
           } else {
-            console.error('Failed to create event:', await response.text());
+            const errorText = await response.text();
+            console.error('Failed to create event. Status:', response.status, 'Error:', errorText);
+            console.error('Event data that failed:', outlookEvent);
             errorCount++;
           }
         } catch (eventError) {
           console.error('Error creating individual event:', eventError);
+          console.error('Event data:', event);
           errorCount++;
         }
         
