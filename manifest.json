@@ -27,7 +27,7 @@
 
   "oauth2":{
     "client_id": "318919291132-9bacc4qts4elfvecovmdmukovm7th8hf.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/calendar.events", "https://graph.microsoft.com/.default"]
+    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
   },
   
   "background": {
