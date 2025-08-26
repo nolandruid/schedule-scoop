@@ -337,6 +337,32 @@ async function getCarletonAndPrivacyPolicy() {
 
         const timetable = tables;
 
+                /**
+         * Determines recurrence pattern based on schedule type
+         * @param {Object} node - Course node with meta data
+         * @param {string} dayOfWeek - Day of week code (MO, TU, etc.)
+         * @param {string} untilDate - End date in UTC format
+         * @returns {string} RRULE string for recurrence
+         */
+                const getRecurrenceRule = (node, dayOfWeek, untilDate) => {
+                  try {
+                    // Check if this is a lab based on Schedule Type
+                    const scheduleType = node.meta && node.meta['Schedule Type'] ? node.meta['Schedule Type'].toLowerCase() : '';
+                    const isLab = scheduleType.includes('lab') || scheduleType.includes('laboratory');
+                    
+                    if (isLab) {
+                      // Labs are typically biweekly (every 2 weeks)
+                      return `FREQ=WEEKLY;INTERVAL=2;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                    } else {
+                      // Lectures and tutorials are weekly
+                      return `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                    }
+                  } catch (err) {
+                    // Default to weekly if error
+                    return `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                  }
+                };
+
         /**
          * Creates iCalendar (.ics) files from timetable data
          * @param {Array<Object>} timetable - Array of course objects containing schedule information
