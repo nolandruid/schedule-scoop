@@ -297,6 +297,8 @@ async function getCarletonAndPrivacyPolicy() {
               section.instructor = instructor.trim() ? instructor.trim() : 'Instructor: N/A';
               const targetIndex = Math.floor(index / 2);
               if (!tables[targetIndex]) tables[targetIndex] = {};
+              //Store meta data with section for component type access
+              section.meta = meta;
               Object.assign(tables[targetIndex], section);
               log.push(meta);
             } else {
@@ -322,6 +324,10 @@ async function getCarletonAndPrivacyPolicy() {
                 let value = cells[o] ? cells[o].textContent.trim() : '';
                 meta[header] = value;
               });
+
+              //Store meta data with section for component type access
+              section.meta = meta;
+              Object.assign(tables[targetIndex], section);
               log.push(meta);
             }
           } catch (err) {
