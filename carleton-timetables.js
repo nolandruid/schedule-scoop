@@ -374,22 +374,16 @@ async function getCarletonAndPrivacyPolicy() {
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
                         
-                        // Store processed event data for Google Calendar
                         processedEvents.push({
-                          summary: `${node.courseCode}-${node.courseSection}`,
-                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}\n${node.instructor}\n${node.crn}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}`,
+                          // Neutral format
+                          title: `${node.courseCode}-${node.courseSection}`,
+                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}...`,
                           location: node.location || 'Location: N/A',
-                          start: {
-                            dateTime: startDate.toISOString(),
-                            timeZone: 'America/Toronto'
-                          },
-                          end: {
-                            dateTime: endDate.toISOString(),
-                            timeZone: 'America/Toronto'
-                          },
-                          recurrence: [`RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`]
-                        });                  
-
+                          startDateTime: startDate,
+                          endDateTime: endDate,
+                          recurrenceRule: `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`,
+                          timezone: 'America/Toronto'
+                        });
                       icsContent += 'BEGIN:VEVENT\n';
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
