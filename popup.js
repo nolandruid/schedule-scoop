@@ -644,3 +644,61 @@ function initCalendarSelection() {
     selectCalendar(selectedCalendar);
   });
 }
+
+/**
+ * Gets Outlook Calendar OAuth token using Microsoft Graph API
+ * @returns {Promise<string>} OAuth access token
+ */
+async function getOutlookCalendarToken() {
+  return new Promise((resolve, reject) => {
+    const clientId = '4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4';
+    const redirectUri = chrome.runtime.getURL('');
+    const scope = 'https://graph.microsoft.com/calendars.readwrite';
+    
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
+      `client_id=${clientId}&` +
+      `response_type=token&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `scope=${encodeURIComponent(scope)}&` +
+      `response_mode=fragment`;
+
+    chrome.identity.launchWebAuthFlow({
+      url: authUrl,
+      interactive: true
+    }, (responseUrl) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(`Authentication failed: ${chrome.runtime.lastError.message}`));
+        return;
+      }
+      
+      if (!responseUrl) {
+        reject(new Error('Authentication cancelled by user'));
+        return;
+      }
+      
+      // Extract access token from URL fragment
+      const urlParams = new URLSearchParams(responseUrl.split('#')[1]);
+      const accessToken = urlParams.get('access_token');
+      
+      if (accessToken) {
+        resolve(accessToken);
+      } else {
+        reject(new Error('Failed to extract access token from response'));
+      }
+    });
+  });
+}
+
+// Add message listener for Outlook authentication
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'getOutlookCalendarToken') {
+    getOutlookCalendarToken()
+      .then(token => {
+        sendResponse({ success: true, token: token });
+      })
+      .catch(error => {
+        sendResponse({ success: false, error: { message: error.message } });
+      });
+    return true; // Keep message channel open for async response
+  }
+});
