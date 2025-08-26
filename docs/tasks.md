@@ -6,7 +6,7 @@ A Chrome extension that helps Carleton University students export their course t
 - [*] Core timetable extraction functionality working
 - [*] Website injection approach implemented
 - [*] Chrome extension manifest configured
-- [ ] Needs direct calendar integration implementation
+- [*] Needs direct calendar integration implementation
 - [ ] Needs UI/UX improvements for calendar selection
 - [ ] Needs code cleanup and modernization
 
@@ -88,7 +88,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Create a modal or dropdown with options for Google Calendar, Outlook, Apple Calendar, etc.
   </details>
 
-- [ ] **Implement Google Calendar integration**
+- [*] **Implement Google Calendar integration**
   <details>
   <summary>Details</summary>
   > **What**: Add direct integration with Google Calendar API
@@ -96,7 +96,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Use Google Calendar API to create events directly in the user's calendar
   </details>
 
-- [ ] **Implement Outlook calendar integration**
+- [*] **Implement Outlook calendar integration**
   <details>
   <summary>Details</summary>
   > **What**: Add direct integration with Outlook/Microsoft Calendar
@@ -104,7 +104,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Use Microsoft Graph API to create events in Outlook calendar
   </details>
 
-- [ ] **Implement Apple Calendar integration**
+- [x] **Implement Apple Calendar integration**
   <details>
   <summary>Details</summary>
   > **What**: Add support for Apple Calendar users
@@ -112,7 +112,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Use Apple Calendar API or generate calendar files for import
   </details>
 
-- [ ] **Add ICS file as fallback option**
+- [*] **Add ICS file as fallback option**
   <details>
   <summary>Details</summary>
   > **What**: Keep ICS file generation as an option for other calendar services
@@ -129,7 +129,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Design a button that matches Carleton's UI style and position it prominently
   </details>
 
-- [ ] **Add loading states and progress indicators**
+- [x] **Add loading states and progress indicators**
   <details>
   <summary>Details</summary>
   > **What**: Show users exactly what step the extension is on during extraction and integration
@@ -145,7 +145,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Create simple, actionable error messages like "Please authorize calendar access"
   </details>
 
-- [ ] **Add success confirmation**
+- [*] **Add success confirmation**
   <details>
   <summary>Details</summary>
   > **What**: Show a clear success message when calendar import completes
@@ -447,8 +447,8 @@ A Chrome extension that helps Carleton University students export their course t
 </details>
 
 ## Success Criteria
-- [ ] Extension works reliably with Carleton University's website
-- [ ] Direct calendar integration with major calendar services (Google, Outlook, Apple)
+- [*] Extension works reliably with Carleton University's website
+- [*] Direct calendar integration with major calendar services (Google, Outlook, ~~Apple~~)
 - [ ] Clean, maintainable codebase with modern JavaScript
 - [ ] User-friendly interface with clear feedback
 - [ ] Proper error handling for all edge cases
