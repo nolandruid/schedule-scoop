@@ -821,6 +821,7 @@ async function getCarletonAndPrivacyPolicy() {
       const rrule = neutralEvent.recurrenceRule;
       const dayMatch = rrule.match(/BYDAY=([^;]+)/);
       const untilMatch = rrule.match(/UNTIL=([^;]+)/);
+      const intervalMatch = rrule.match(/INTERVAL=(\d+)/);
       
       if (dayMatch && untilMatch) {
         // Map day codes from RRULE to Outlook format
@@ -834,12 +835,13 @@ async function getCarletonAndPrivacyPolicy() {
         
         const days = dayMatch[1].split(',').map(day => dayMapping[day]).filter(Boolean);
         const until = new Date(untilMatch[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z'));
+        const interval = intervalMatch ? parseInt(intervalMatch[1]) : 1;
         
         if (days.length > 0) {
           recurrencePattern = {
             pattern: {
               type: 'weekly',
-              interval: 1,
+              interval: interval, // Use extracted interval (1 for weekly, 2 for biweekly)
               daysOfWeek: days
             },
             range: {
