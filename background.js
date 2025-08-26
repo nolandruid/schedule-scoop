@@ -89,6 +89,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
 
+  // Handle Outlook Calendar token request synchronously
+  if (message.action === 'getOutlookCalendarToken') {
+    const clientId = '4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4';
+    const redirectUri = chrome.runtime.getURL('');
+    const scope = 'https://graph.microsoft.com/calendars.readwrite';
+    
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +
+      `client_id=${clientId}&` +
+      `response_type=token&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `scope=${encodeURIComponent(scope)}&` +
+      `response_mode=fragment`;
+
+    chrome.identity.launchWebAuthFlow({
+      url: authUrl,
+      interactive: true
+    }, (responseUrl) => {
+      if (chrome.runtime.lastError) {
+        console.error('Outlook Calendar auth error:', chrome.runtime.lastError);
+        sendResponse({ success: false, error: { message: chrome.runtime.lastError.message } });
+        return;
+      }
+      
+      if (!responseUrl) {
+        console.error('Outlook Calendar auth cancelled');
+        sendResponse({ success: false, error: { message: 'Authentication cancelled by user' } });
+        return;
+      }
+      
+      // Extract access token from URL fragment
+      const urlParams = new URLSearchParams(responseUrl.split('#')[1]);
+      const accessToken = urlParams.get('access_token');
+      
+      if (accessToken) {
+        console.log('Outlook Calendar token obtained successfully');
+        sendResponse({ success: true, token: accessToken });
+      } else {
+        console.error('Failed to extract Outlook access token');
+        sendResponse({ success: false, error: { message: 'Failed to extract access token from response' } });
+      }
+    });
+    return true; // Keep message channel open for async response
+  }
+
   // Handle other async operations
   (async () => {
 
