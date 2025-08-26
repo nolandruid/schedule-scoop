@@ -413,13 +413,13 @@ async function getCarletonAndPrivacyPolicy() {
                           location: node.location || 'Location: N/A',
                           startDateTime: startDate,
                           endDateTime: endDate,
-                          recurrenceRule: `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`,
+                          recurrenceRule: getRecurrenceRule(node, dayOfWeek, formatDateUTC(untilDate)),
                           timezone: 'America/Toronto'
                         });
                       icsContent += 'BEGIN:VEVENT\n';
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
-                      icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
+                      icsContent += `RRULE:${getRecurrenceRule(node, dayOfWeek, formatDateUTC(untilDate))}\n`;
                       icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
                       icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
                       icsContent += `LOCATION:${node.location}\n`;
