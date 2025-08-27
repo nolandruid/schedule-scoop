@@ -395,7 +395,7 @@ async function getCarletonAndPrivacyPolicy() {
                     const dayOfWeek = daysMap[day];
                     if (dayOfWeek && startTime != 'none') {
                       // Adjust start date to this specific day
-                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day);
+                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day, node);
                       const startDate = new Date(adjustedStartDate);
                       const endDate = new Date(adjustedStartDate);
                       const untilDate = new Date(node.endDate);
@@ -610,7 +610,7 @@ async function getCarletonAndPrivacyPolicy() {
          * @param {string} daysOfTheWeek - String containing day codes (M, T, W, R, F)
          * @returns {Date} Adjusted date that falls on the first specified day
          */
-        const adjustStartDateToDay = (startDate, dayCode) => {
+        const adjustStartDateToDay = (startDate, dayCode, node) => {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
             if (!dayCode || dayCode.length === 0) return startDate;
@@ -618,7 +618,21 @@ async function getCarletonAndPrivacyPolicy() {
             const dayOfWeek = daysMap[dayCode];
             const currentDay = startDate.getDay();
             let diff = dayOfWeek - currentDay;
+            const wasNegative = diff < 0; // Track if target day was earlier in week
             if (diff < 0) diff += 7;
+
+            // Check if this is a tutorial or lab that should start in second week
+            const scheduleType = node && node.meta && node.meta['Schedule Type'] ? node.meta['Schedule Type'].toLowerCase() : '';
+            const isLab = scheduleType.includes('laboratory') || scheduleType.includes('lab');
+            const isTutorial = scheduleType.includes('tutorial') || scheduleType.includes('tut');
+            
+            if (isLab || isTutorial) {
+              if (!wasNegative) {
+                // Target day wasn't earlier in week than term start - add 7 for second week
+                diff += 7;
+              }
+            }
+
             startDate.setDate(startDate.getDate() + diff);
             return startDate;
           } catch (err) {
