@@ -167,6 +167,30 @@ body {
   transition: all 0.4s ease;
 }
 
+.node2:hover{
+  background: #4a467c;
+  transform: scale(1.05);
+}
+
+.node2:active{
+  transition: all 0.04s ease;
+  background: #66628d;
+  transform: scale(1.08);
+}
+
+.node2{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.term{
+  color: #fff;
+  margin-left: 16px;
+}
+
 .panel .nav-links li i.central{
   height: 50px;
   min-width: 70px;

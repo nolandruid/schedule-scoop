@@ -421,7 +421,8 @@ async function getCarletonAndPrivacyPolicy() {
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = userInfo2 + '.ics';
+                        const filenameTerm = mapTerm(r) || userInfo2 || 'Term';
+                        a.download = `${filenameTerm}.ics`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
@@ -526,7 +527,8 @@ async function getCarletonAndPrivacyPolicy() {
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = `${node.courseCode}-${node.courseSection}` + '.ics';
+                            const filenameTerm = mapTerm(r) || 'Term';
+                            a.download = `${filenameTerm}.ics`;
                             document.body.appendChild(a);
                             a.click();
                             document.body.removeChild(a);
