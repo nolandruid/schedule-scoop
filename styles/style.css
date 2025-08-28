@@ -1110,6 +1110,7 @@ input:checked + .toggle-switch::before{
   border-radius: 8px;
   margin: 2px 0;
   transition: all 0.3s ease;
+  color: #d5ddba;
 }
 
 .panel .nav-links li .sub-menu a.calendar-option.selected {
