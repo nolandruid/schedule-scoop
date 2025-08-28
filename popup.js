@@ -747,17 +747,65 @@ function handleFeedbackSubmission(e) {
 }
 
 /**
- * Send feedback data (placeholder implementation)
+ * Send feedback data to Discord webhook
  * @param {Object} feedbackData - The feedback data to send
  * @returns {Promise} Promise that resolves when feedback is sent
  */
 function sendFeedback(feedbackData) {
-  // For now, just log to console and resolve after a short delay
-  // You can replace this with your actual feedback submission logic
-  console.log('Feedback submitted:', feedbackData);
+  const webhookUrl = 'https://discord.com/api/webhooks/1410751558974439526/8mCube_3wFRkxkfDBgJ77JMwaF3olsePFJXXMuLPXHKMoFsqqb6JRNS0NQPHy2Rd_7_Q';
   
-  return new Promise((resolve) => {
-    setTimeout(resolve, 1000);
+  // Format timestamp like in the image
+  const timestamp = new Date(feedbackData.timestamp).toLocaleString('en-CA', {
+    year: 'numeric',
+    month: '2-digit', 
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  // Create Discord embed format matching the Termwise style
+  const discordPayload = {
+    username: "Schedule Scoop Feedback",
+    avatar_url: "https://raw.githubusercontent.com/nolandruid/schedule-scoop/main/images/calendar128.png",
+    embeds: [{
+      description: `\`\`\`\n${feedbackData.feedback.length > 1994 ? 
+        feedbackData.feedback.substring(0, 1991) + '...' : 
+        feedbackData.feedback}\n\`\`\``,
+      color: 0x4A90E2, // Blue color similar to the image
+      fields: [
+        {
+          name: "Contact Email",
+          value: feedbackData.email === 'anonymous' ? 'Anonymous' : feedbackData.email,
+          inline: false
+        },
+        {
+          name: "Timestamp", 
+          value: timestamp,
+          inline: false
+        }
+      ],
+      timestamp: feedbackData.timestamp
+    }]
+  };
+
+  return fetch(webhookUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(discordPayload)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Discord webhook failed: ${response.status}`);
+    }
+    console.log('Feedback sent to Discord successfully');
+    return response;
+  })
+  .catch(error => {
+    console.error('Failed to send feedback to Discord:', error);
+    throw error;
   });
 }
 
