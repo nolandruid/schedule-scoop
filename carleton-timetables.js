@@ -297,6 +297,8 @@ async function getCarletonAndPrivacyPolicy() {
               section.instructor = instructor.trim() ? instructor.trim() : 'Instructor: N/A';
               const targetIndex = Math.floor(index / 2);
               if (!tables[targetIndex]) tables[targetIndex] = {};
+              //Store meta data with section for component type access
+              section.meta = meta;
               Object.assign(tables[targetIndex], section);
               log.push(meta);
             } else {
@@ -322,6 +324,10 @@ async function getCarletonAndPrivacyPolicy() {
                 let value = cells[o] ? cells[o].textContent.trim() : '';
                 meta[header] = value;
               });
+
+              //Store meta data with section for component type access
+              section.meta = meta;
+              Object.assign(tables[targetIndex], section);
               log.push(meta);
             }
           } catch (err) {
@@ -330,6 +336,32 @@ async function getCarletonAndPrivacyPolicy() {
         });
 
         const timetable = tables;
+
+                /**
+         * Determines recurrence pattern based on schedule type
+         * @param {Object} node - Course node with meta data
+         * @param {string} dayOfWeek - Day of week code (MO, TU, etc.)
+         * @param {string} untilDate - End date in UTC format
+         * @returns {string} RRULE string for recurrence
+         */
+                const getRecurrenceRule = (node, dayOfWeek, untilDate) => {
+                  try {
+                    // Check if this is a lab based on Schedule Type
+                    const scheduleType = node.meta && node.meta['Schedule Type'] ? node.meta['Schedule Type'].toLowerCase() : '';
+                    const isLab = scheduleType.includes('lab') || scheduleType.includes('laboratory');
+                    
+                    if (isLab) {
+                      // Labs are typically biweekly (every 2 weeks)
+                      return `FREQ=WEEKLY;INTERVAL=2;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                    } else {
+                      // Lectures and tutorials are weekly
+                      return `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                    }
+                  } catch (err) {
+                    // Default to weekly if error
+                    return `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${untilDate};WKST=SU`;
+                  }
+                };
 
         /**
          * Creates iCalendar (.ics) files from timetable data
@@ -363,13 +395,13 @@ async function getCarletonAndPrivacyPolicy() {
                     const dayOfWeek = daysMap[day];
                     if (dayOfWeek && startTime != 'none') {
                       // Adjust start date to this specific day
-                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day);
+                      const adjustedStartDate = adjustStartDateToDay(new Date(node.startDate), day, node);
                       const startDate = new Date(adjustedStartDate);
                       const endDate = new Date(adjustedStartDate);
                       const untilDate = new Date(node.endDate);
                       untilDate.setDate(untilDate.getDate() + 1);
-                      startDate.setUTCHours(startHour, startMinute, 0, 0);
-                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      startDate.setHours(startHour, startMinute, 0, 0);
+                      endDate.setHours(endHour, endMinute, 0, 0);
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
@@ -377,17 +409,17 @@ async function getCarletonAndPrivacyPolicy() {
                         processedEvents.push({
                           // Neutral format
                           title: `${node.courseCode}-${node.courseSection}`,
-                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}...`,
+                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}\n${node.instructor}\n${node.crn}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}`,
                           location: node.location || 'Location: N/A',
                           startDateTime: startDate,
                           endDateTime: endDate,
-                          recurrenceRule: `FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU`,
+                          recurrenceRule: getRecurrenceRule(node, dayOfWeek, formatDateUTC(untilDate)),
                           timezone: 'America/Toronto'
                         });
                       icsContent += 'BEGIN:VEVENT\n';
                       icsContent += `DTSTART;TZID=America/Toronto:${formatDateLocal(startDate)}\n`;
                       icsContent += `DTEND;TZID=America/Toronto:${formatDateLocal(endDate)}\n`;
-                      icsContent += `RRULE:FREQ=WEEKLY;BYDAY=${dayOfWeek};UNTIL=${formatDateUTC(untilDate)};WKST=SU;\n`;
+                      icsContent += `RRULE:${getRecurrenceRule(node, dayOfWeek, formatDateUTC(untilDate))}\n`;
                       icsContent += `SUMMARY:${node.courseCode}-${node.courseSection}\n`;
                       icsContent += `DESCRIPTION:${node.courseName}\\n${node.courseCode} - ${node.courseSection}\\n${node.instructor}\\n${node.crn}\\n${timeNoSpace} - ${timeNoSpace2}\\n${node.location ? node.location : 'Location: N/A'}\n`;
                       icsContent += `LOCATION:${node.location}\n`;
@@ -467,8 +499,8 @@ async function getCarletonAndPrivacyPolicy() {
                       const endDate = new Date(adjustedStartDate);
                       const untilDate = new Date(node.endDate);
                       untilDate.setDate(untilDate.getDate() + 1);
-                      startDate.setUTCHours(startHour, startMinute, 0, 0);
-                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      startDate.setHours(startHour, startMinute, 0, 0);
+                      endDate.setHours(endHour, endMinute, 0, 0);
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
@@ -578,7 +610,7 @@ async function getCarletonAndPrivacyPolicy() {
          * @param {string} daysOfTheWeek - String containing day codes (M, T, W, R, F)
          * @returns {Date} Adjusted date that falls on the first specified day
          */
-        const adjustStartDateToDay = (startDate, dayCode) => {
+        const adjustStartDateToDay = (startDate, dayCode, node) => {
           try {
             const daysMap = { 'M': 1, 'T': 2, 'W': 3, 'R': 4, 'F': 5 };
             if (!dayCode || dayCode.length === 0) return startDate;
@@ -586,7 +618,21 @@ async function getCarletonAndPrivacyPolicy() {
             const dayOfWeek = daysMap[dayCode];
             const currentDay = startDate.getDay();
             let diff = dayOfWeek - currentDay;
+            const wasNegative = diff < 0; // Track if target day was earlier in week
             if (diff < 0) diff += 7;
+
+            // Check if this is a tutorial or lab that should start in second week
+            const scheduleType = node && node.meta && node.meta['Schedule Type'] ? node.meta['Schedule Type'].toLowerCase() : '';
+            const isLab = scheduleType.includes('laboratory') || scheduleType.includes('lab');
+            const isTutorial = scheduleType.includes('tutorial') || scheduleType.includes('tut');
+            
+            if (isLab || isTutorial) {
+              if (!wasNegative) {
+                // Target day wasn't earlier in week than term start - add 7 for second week
+                diff += 7;
+              }
+            }
+
             startDate.setDate(startDate.getDate() + diff);
             return startDate;
           } catch (err) {
@@ -789,6 +835,7 @@ async function getCarletonAndPrivacyPolicy() {
       const rrule = neutralEvent.recurrenceRule;
       const dayMatch = rrule.match(/BYDAY=([^;]+)/);
       const untilMatch = rrule.match(/UNTIL=([^;]+)/);
+      const intervalMatch = rrule.match(/INTERVAL=(\d+)/);
       
       if (dayMatch && untilMatch) {
         // Map day codes from RRULE to Outlook format
@@ -802,12 +849,13 @@ async function getCarletonAndPrivacyPolicy() {
         
         const days = dayMatch[1].split(',').map(day => dayMapping[day]).filter(Boolean);
         const until = new Date(untilMatch[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z'));
+        const interval = intervalMatch ? parseInt(intervalMatch[1]) : 1;
         
         if (days.length > 0) {
           recurrencePattern = {
             pattern: {
               type: 'weekly',
-              interval: 1,
+              interval: interval, // Use extracted interval (1 for weekly, 2 for biweekly)
               daysOfWeek: days
             },
             range: {
