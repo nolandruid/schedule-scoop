@@ -638,4 +638,162 @@ document.addEventListener('DOMContentLoaded', () => {
   if (yearSelect) {
     yearSelect.addEventListener('change', updateTermDisplay);
   }
+
+  // Initialize feedback functionality
+  initializeFeedback();
 });
+
+/**
+ * Initialize feedback overlay functionality
+ */
+function initializeFeedback() {
+  const feedbackBtn = document.getElementById('feedback-btn');
+  const feedbackOverlay = document.getElementById('feedback-overlay');
+  const closeFeedbackBtn = document.getElementById('close-feedback');
+  const cancelFeedbackBtn = document.getElementById('cancel-feedback');
+  const feedbackForm = document.getElementById('feedback-form');
+
+  // Show feedback overlay
+  if (feedbackBtn) {
+    feedbackBtn.addEventListener('click', () => {
+      feedbackOverlay.classList.remove('hidden');
+    });
+  }
+
+  // Hide feedback overlay
+  function hideFeedbackOverlay() {
+    feedbackOverlay.classList.add('hidden');
+    // Reset form
+    if (feedbackForm) {
+      feedbackForm.reset();
+    }
+  }
+
+  if (closeFeedbackBtn) {
+    closeFeedbackBtn.addEventListener('click', hideFeedbackOverlay);
+  }
+
+  if (cancelFeedbackBtn) {
+    cancelFeedbackBtn.addEventListener('click', hideFeedbackOverlay);
+  }
+
+  // Close overlay when clicking outside the form
+  if (feedbackOverlay) {
+    feedbackOverlay.addEventListener('click', (e) => {
+      if (e.target === feedbackOverlay) {
+        hideFeedbackOverlay();
+      }
+    });
+  }
+
+  // Handle form submission
+  if (feedbackForm) {
+    feedbackForm.addEventListener('submit', handleFeedbackSubmission);
+  }
+}
+
+/**
+ * Handle feedback form submission
+ * @param {Event} e - Form submission event
+ */
+function handleFeedbackSubmission(e) {
+  e.preventDefault();
+
+  const emailInput = document.getElementById('feedback-email');
+  const textInput = document.getElementById('feedback-text');
+  const submitBtn = document.querySelector('.submit-feedback');
+
+  // Validate required field
+  if (!textInput.value.trim()) {
+    textInput.focus();
+    textInput.style.borderColor = '#ff4444';
+    setTimeout(() => {
+      textInput.style.borderColor = '#444';
+    }, 2000);
+    return;
+  }
+
+  // Disable submit button during processing
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+
+  // Prepare feedback data
+  const feedbackData = {
+    email: emailInput.value.trim() || 'anonymous',
+    feedback: textInput.value.trim(),
+    timestamp: new Date().toISOString(),
+    extension: 'Schedule Scoop',
+    version: chrome.runtime.getManifest().version
+  };
+
+  // Send feedback (you can implement your preferred method here)
+  sendFeedback(feedbackData)
+    .then(() => {
+      // Success - show confirmation and close overlay
+      showFeedbackConfirmation();
+      document.getElementById('feedback-overlay').classList.add('hidden');
+      document.getElementById('feedback-form').reset();
+    })
+    .catch((error) => {
+      console.error('Failed to send feedback:', error);
+      // Show error message
+      showFeedbackError();
+    })
+    .finally(() => {
+      // Re-enable submit button
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Feedback';
+    });
+}
+
+/**
+ * Send feedback data (placeholder implementation)
+ * @param {Object} feedbackData - The feedback data to send
+ * @returns {Promise} Promise that resolves when feedback is sent
+ */
+function sendFeedback(feedbackData) {
+  // For now, just log to console and resolve after a short delay
+  // You can replace this with your actual feedback submission logic
+  console.log('Feedback submitted:', feedbackData);
+  
+  return new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
+}
+
+/**
+ * Show feedback confirmation message
+ */
+function showFeedbackConfirmation() {
+  // You can implement a toast notification or use existing notification system
+  console.log('Feedback sent successfully!');
+  
+  // Optional: Show a brief success message
+  const feedbackBtn = document.getElementById('feedback-btn');
+  const originalText = feedbackBtn.textContent;
+  feedbackBtn.textContent = 'Thanks!';
+  feedbackBtn.style.color = '#2af85d';
+  
+  setTimeout(() => {
+    feedbackBtn.textContent = originalText;
+    feedbackBtn.style.color = '';
+  }, 2000);
+}
+
+/**
+ * Show feedback error message
+ */
+function showFeedbackError() {
+  console.error('Failed to send feedback');
+  
+  // Optional: Show error indication
+  const feedbackBtn = document.getElementById('feedback-btn');
+  const originalText = feedbackBtn.textContent;
+  feedbackBtn.textContent = 'Error';
+  feedbackBtn.style.color = '#ff4444';
+  
+  setTimeout(() => {
+    feedbackBtn.textContent = originalText;
+    feedbackBtn.style.color = '';
+  }, 2000);
+}

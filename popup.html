@@ -50,7 +50,6 @@
           <li>
             <a href="#" class="calendar-option" data-calendar-type="outlook">
                 <img src="images/microsoft-logo.png" alt="Microsoft" style="width: 1.7em; height: 1.7em; object-fit: contain;">
-                <img src="images/microsoft-logo.png" alt="Microsoft" style="width: 1.7em; height: 1.7em; object-fit: contain;">
               <span class="force-active">Outlook</span>
             </a>
           </li>
@@ -116,7 +115,9 @@
     </div>
 
     <div class="version-details">
-        <span class="config-policy-btn" data-node="interface">Privacy Policy</span>
+        <span class="config-policy-btn" data-node="interface" style="color:#ffffff">Privacy Policy</span>
+        <span class="separator" style="color:#ffffff">·</span>
+        <span class="feedback-btn" id="feedback-btn" style="color:#ffffff">Feedback</span>
       </div>
 
     </ul>
@@ -126,6 +127,30 @@
 
     <!-- Notification banner screen overlay -->
     <div class="banner-screen hidden"></div>
+
+    <!-- Feedback overlay -->
+    <div class="feedback-overlay hidden" id="feedback-overlay">
+      <div class="feedback-container">
+        <div class="feedback-header">
+          <h3>Send Feedback</h3>
+          <button class="close-feedback" id="close-feedback">&times;</button>
+        </div>
+        <form class="feedback-form" id="feedback-form">
+          <div class="form-group">
+            <label for="feedback-email">Email (optional)</label>
+            <input type="email" id="feedback-email" placeholder="your.email@example.com">
+          </div>
+          <div class="form-group">
+            <label for="feedback-text">Feedback *</label>
+            <textarea id="feedback-text" placeholder="Tell us what you think..." rows="4" required></textarea>
+          </div>
+          <div class="feedback-actions">
+            <button type="button" class="cancel-feedback" id="cancel-feedback">Cancel</button>
+            <button type="submit" class="submit-feedback">Send Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Configuration overlay -->
     <div class="timetable config-overlay hidden">
