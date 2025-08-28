@@ -43,8 +43,8 @@ const calendarOptions = document.querySelectorAll('.calendar-option');
 const GOOGLE_CALENDAR_API_BASE = 'https://www.googleapis.com/calendar/v3';
 const GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
-const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
-const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
+const policyURL = 'https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy'
+const dataPolicyURL = 'https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy'
 
 const refresh = {
   'carleton': (e) => refreshTimetable(e),

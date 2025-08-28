@@ -188,7 +188,8 @@ body {
 
 .term{
   color: #fff;
-  margin-left: 16px;
+  font-size: 18px;
+  margin-left: 20px;
 }
 
 .panel .nav-links li i.central{
@@ -1118,7 +1119,6 @@ input:checked + .toggle-switch::before{
   font-weight: 600;
 }
 
-/* Developer Credits */
 .developer-credits {
   display: flex;
   align-items: center;
