@@ -14,25 +14,28 @@
     <div class="logo-details">
       <!-- <img class="logo-image" id="popup-logo-img1" src="images/calendar256.png" alt="calendar_icon"> -->
       <i class='bx bx-calendar logo-image' ></i>
-      <span class="logo-name">Timetable Tools</span>
+      <span class="logo-name">ScheduleScoop</span>
     </div>
     <ul class="nav-links">
       <!-- entry -->
+       
       <li class="">
-        <a href="#" class="config-btn" data-school="carleton" data-node="timetable-tool">
-          <i class='bx bxs-download central' style='color:#fff4f4'></i>
-          <span class="link-name">Select term</span>
+        <a href="#" class="config-btn node2" data-school="carleton" data-node="timetable-tool">
+          <i class='bx bx-book central' style='color:#fff4f4'></i>
+          <span class="link-name">Select Term</span>
           <div class="config-container" data-school="carleton" data-node="timetable-tool">
-            <span class="node-state" data-school="carleton" data-node="timetable-tool">Winter 2025</span>
-            <i class='bx bxs-cog' style='color:#fff4f4'></i>
+            <span class="node-state term" data-school="carleton" data-node="timetable-tool">Winter 2077</span>
+
+            <!-- <span id="term-display" class="term" data-school="carleton" data-node="timetable-tool"></span> -->
+            <!-- <i class='bx bxs-cog' style='color:#fff4f4'></i> -->
           </div>
         </a>
       </li>
-      <li class="">
 
+      <li class="">
         <div class="node" id="timetable-tool">
           <a href="#">
-            <i class='bx bxs-download central' style='color:#fff4f4'  ></i>
+            <i class='bx bx-calendar-exclamation central' style='color:#fff4f4'  ></i>
             <span class="link-name">Select Calendar</span>
           </a>
             <i class="bx bxs-chevron-down arrow central"></i>
@@ -40,25 +43,25 @@
         <ul class="sub-menu">
           <li>
             <a href="#" class="calendar-option" data-calendar-type="google">
-              <i class='bx bxl-google' style='color:#4285f4'></i>
+                <i class='bx bxl-google' style='color:#4285f4; font-size: 1.7em;'></i>
               <span class="force-active">Google Calendar</span>
             </a>
           </li>
           <li>
             <a href="#" class="calendar-option" data-calendar-type="outlook">
-              <i class='bx bxl-microsoft' style='color:#0078d4'></i>
+                <i class='bx bxl-microsoft' style='color:#0078d4; font-size: 1.7em;'></i>
               <span class="force-active">Outlook</span>
             </a>
           </li>
-          <li>
+          <!-- <li>
             <a href="#" class="calendar-option" data-calendar-type="apple">
               <i class='bx bxl-apple' style='color:#000000'></i>
               <span class="force-active">Apple Calendar</span>
-            </a>
+            </a> -->
           </li>
           <li>
             <a href="#" class="calendar-option" data-calendar-type="ics">
-              <i class='bx bx-file' style='color:#ffffff'></i>
+                <i class='bx bx-file' style='color:#ffffff; font-size: 1.7em;'></i>
               <span class="force-active">ICS File</span>
             </a>
           </li>
@@ -67,19 +70,23 @@
 
       <!-- Export Button -->
       <li class="export-button-container">
-        <button class="export-btn selector carleton require-opened-cu" data-school="carleton" data-url="https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd" data-calendar="https://central.carleton.ca/prod/bwskfshd.P_CrseSchd" data-timetables="https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl" data-injection="carleton-timetables.js">
-          <i class='bx bxs-download' style='color:#ffffff'></i>
-          <span>Export</span>
+        <button class="export-btn selector carleton require-opened-cu" data-school="carleton" data-url="https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd" data-calendar="https://central.carleton.ca/prod/bwskfshd.P_CrseSchd" data-timetables="https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl" data-injection="carleton-timetables.js" style="font-size: 1.2em;">
+          <i class='bx bxs-download' style='color:#ffffff; font-size: 1.2em;'></i>
+          <span style="font-size: 1.2em;">Export</span>
         </button>
       </li>
 
       <div class="socials">
-        <a class="github-link social-icon" href="https://github.com/DerekY2/timetable-tools" target="_blank">
-          <i class='bx bxl-github' style='color:#ffffff' ></i>
+        <a class="github-link social-icon" href="https://github.com/nolandruid/schedule-scoop" target="_blank">
+          <i class='bx bxl-github' style='color:#ffffff; font-size: 1.3em;'></i>
         </a>
-        <a href="https://www.linkedin.com/in/derek-yu-53273130b/" class="linkedin-link social-icon" target="_blank">
+        </a>
+        <!-- <a href="https://www.linkedin.com/in/nolandruid/" class="linkedin-link social-icon" target="_blank">
           <i class='bx bxl-linkedin-square' style='color:#ffffff' ></i>
         </a>
+        <a href="https://www.linkedin.com/in/siddig-ahmed-aa1757329/" class="linkedin-link social-icon" target="_blank">
+          <i class='bx bxl-linkedin-square' style='color:#ffffff' ></i>
+        </a> -->
         <a class="social-icon test" target="_blank" href="https://www.buymeacoffee.com/yawndeer">
           <i class='bx bx-coffee-togo' style='color:#ffffff' ></i>
         </a>
@@ -88,9 +95,18 @@
           <i class='bx bxs-color change-logo-btn' style='color:#ffffff' ></i>
         </div>
       </div>
-      <div class="version-details">
+
+    <div class="developer-credits">
+      <a href="https://www.linkedin.com/in/nolandruid/" class="dev-link" target="_blank">Nolan</a>
+      <span class="separator">·</span>
+      <a href="https://www.linkedin.com/in/siddig-ahmed-aa1757329/" class="dev-link" target="_blank">Siddig</a>
+    </div>
+
+    <div class="version-details">
         <span class="config-policy-btn" data-node="interface">Privacy Policy</span>
+        <span class="show-version-details" data-url="https://chromewebstore.google.com/detail/neuronest/dolaidlinopdijhbmholdeilalbedhjm">NeuroNest</span>
       </div>
+
     </ul>
 
     <!-- Dark screen overlay -->
@@ -110,7 +126,7 @@
       <div class="timetable config-content">
         <select id="school-select" name="school" class="select-school dropdown-config-select" data-node="timetable-tool">
           <option value="carleton">Carleton</option>
-          <!-- <option value="ottawa">Ottawa</option>
+          <!-- <option value="ottawa">UOttawa</option>
           <option value="waterloo">Waterloo</option> -->
         </select>
 
@@ -121,39 +137,38 @@
         </select>
         <select id="year-select" name="year">
           <option value="2025">2025</option>
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-          <option value="2022">2022</option>
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
-          <option value="2019">2019</option>
-          <option value="2018">2018</option>
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
           <!-- Add more options as needed -->
         </select>
       </div>
+
+
       <div class="config-vertical">
-        <h3>Export Mode</h3>
+        <!-- <h3>Export Mode</h3> -->
         <div class="config-content more-timetable">
           <div class="switch-container">
-            <span class="left-span">Individual</span>
-            <input type="checkbox" id="export-mode" data-node="timetable-tool" class="toggle-switch"/>
-            <label for="export-mode" data-node="timetable-tool" class="toggle-switch"></label>
-            <span>Combined</span>
+            <!-- <span class="left-span">Individual</span> -->
+            <input id="export-mode" />
+            <!-- <label for="export-mode" ></label> -->
+            <!-- <span>Combined</span> -->
           </div>
         </div>
       </div>
+
+
       <div class="config-footer">
         <div class="term-reset-btn config-reset-btn" data-node="timetable-tool"><span>Reset</span></div>
         <div class="term-save-btn config-save-btn" data-node="timetable-tool"><span>Save</span></div>
-        <div class="term-admin-btn config-policy-btn" data-node="timetable-tools"><span >Privacy Policy</span></div>
+        <!-- <div class="term-admin-btn config-policy-btn" data-node="timetable-tools"><span >Privacy Policy</span></div> -->
       </div>
     </div>
     <div class="modal privacy-policy-modal hidden">
       <div class="modal-content">
         <h2>Hi there,</h2>
-        <p>Welcome to Timetable Tools! Please read and agree to our <a href="https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md" target="_blank">Privacy Policy</a> to continue.</p>
+        <p>Welcome to Timetable Tools! Please read and agree to our <a href="https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy" target="_blank">Privacy Policy</a> to continue.</p>
         <div>
-          <input type="checkbox" id="policy-agreement-checkbox"> I have read and agree to the <a href="https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md" target="_blank">Privacy Policy</a>.
+          <input type="checkbox" id="policy-agreement-checkbox"> I have read and agree to the <a href="https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy" target="_blank">Privacy Policy</a>.
         </div>
         <button id="policy-agreement-btn">Let's Go!</button>
       </div>
@@ -166,7 +181,9 @@
       <div class="banner-content">
         <span class="banner-msg banner-placeholder">erm</span>
         <p class="banner-msg no-timetable-found hidden">No Timetable Found.</p>
-        <p class="banner-msg timetable-tool-info hidden"><span class="highlight">Downloads</span> the selected term timetable as a standard <span class="highlight">calendar-ready (.ics) file</span>.<br><span class="highlight2">Export Modes:</span><br><span class="highlight">Combined:</span> Exports the entire term schedule as a single calendar file.<br>(e.g. Winter 2025.ics)<br><span class="highlight">Individual:</span> Each term event is exported and downloaded separately.<br>(e.g. COMP 3106-B.ics)</p>
+        <p class="banner-msg timetable-tool-info hidden"><span class="highlight">Downloads</span> the selected term timetable as a standard <span class="highlight">calendar-ready (.ics) file</span>.<br><span class="highlight2">
+          <!-- Export Modes:</span><br><span class="highlight">Combined:</span> Exports the entire term schedule as a single calendar file.<br>(e.g. Winter 2025.ics)<br><span class="highlight">Individual:</span> Each term event is exported and downloaded separately.<br>(e.g. COMP 3106-B.ics) -->
+        </p>
       </div>
       <div class="banner-footer">
         <div class="banner-reset-btn"><span>Reset</span></div>

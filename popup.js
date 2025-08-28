@@ -43,8 +43,8 @@ const calendarOptions = document.querySelectorAll('.calendar-option');
 const GOOGLE_CALENDAR_API_BASE = 'https://www.googleapis.com/calendar/v3';
 const GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
-const policyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md'
-const dataPolicyURL = 'https://github.com/DerekY2/ext-privacy-policies/blob/main/NeuroNest.md#data-collection'
+const policyURL = 'https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy'
+const dataPolicyURL = 'https://github.com/nolandruid/schedule-scoop/blob/main/ext-privacy-policy'
 
 const refresh = {
   'carleton': (e) => refreshTimetable(e),
@@ -575,3 +575,67 @@ function getSelectedCalendar() {
     });
   });
 }
+
+/**
+ * Initializes calendar option selection UI and persistence
+ */
+function initCalendarSelection() {
+  const initFn = async () => {
+    try {
+      // Restore previous selection
+      const selected = await getSelectedCalendar();
+      selectCalendar(selected);
+
+      // Wire click handlers
+      const options = document.querySelectorAll('.calendar-option');
+      options.forEach((option) => {
+        if (option && option.addEventListener) {
+          option.addEventListener('click', (e) => {
+            if (e && e.preventDefault) e.preventDefault();
+            const type = option.dataset ? option.dataset.calendarType : undefined;
+            if (type) selectCalendar(type);
+          });
+        }
+      });
+    } catch (err) {
+      // Swallow to avoid breaking popup render
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFn, { once: true });
+  } else {
+    initFn();
+  }
+}
+
+function updateTermDisplay() {
+  const semesterSelect = document.getElementById('semester-select');
+  const yearSelect = document.getElementById('year-select');
+  const termDisplay = document.getElementById('term-display');
+
+  if (!semesterSelect || !yearSelect || !termDisplay) {
+    return;
+  }
+
+  let semesterLabel = semesterSelect.options[semesterSelect.selectedIndex].text;
+  let year = yearSelect.value;
+
+  semesterLabel = semesterLabel.charAt(0).toUpperCase() + semesterLabel.slice(1);
+
+  termDisplay.textContent = `(${semesterLabel} ${year})`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateTermDisplay();
+
+  const semesterSelect = document.getElementById('semester-select');
+  const yearSelect = document.getElementById('year-select');
+
+  if (semesterSelect) {
+    semesterSelect.addEventListener('change', updateTermDisplay);
+  }
+  if (yearSelect) {
+    yearSelect.addEventListener('change', updateTermDisplay);
+  }
+});
