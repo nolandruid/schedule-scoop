@@ -400,8 +400,8 @@ async function getCarletonAndPrivacyPolicy() {
                       const endDate = new Date(adjustedStartDate);
                       const untilDate = new Date(node.endDate);
                       untilDate.setDate(untilDate.getDate() + 1);
-                      startDate.setUTCHours(startHour, startMinute, 0, 0);
-                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      startDate.setHours(startHour, startMinute, 0, 0);
+                      endDate.setHours(endHour, endMinute, 0, 0);
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
@@ -499,8 +499,8 @@ async function getCarletonAndPrivacyPolicy() {
                       const endDate = new Date(adjustedStartDate);
                       const untilDate = new Date(node.endDate);
                       untilDate.setDate(untilDate.getDate() + 1);
-                      startDate.setUTCHours(startHour, startMinute, 0, 0);
-                      endDate.setUTCHours(endHour, endMinute, 0, 0);
+                      startDate.setHours(startHour, startMinute, 0, 0);
+                      endDate.setHours(endHour, endMinute, 0, 0);
                       
                       const courseInfo = `${node.courseCode} - ${node.courseSection}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}\n${node.courseName}\n${node.instructor}\n${node.crn}\n...\n`;
                       allCourses += courseInfo;
