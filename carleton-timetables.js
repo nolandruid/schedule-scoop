@@ -409,7 +409,7 @@ async function getCarletonAndPrivacyPolicy() {
                         processedEvents.push({
                           // Neutral format
                           title: `${node.courseCode}-${node.courseSection}`,
-                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}...`,
+                          description: `${node.courseName}\n${node.courseCode} - ${node.courseSection}\n${node.instructor}\n${node.crn}\n${timeNoSpace} - ${timeNoSpace2}\n${node.location ? node.location : 'Location: N/A'}`,
                           location: node.location || 'Location: N/A',
                           startDateTime: startDate,
                           endDateTime: endDate,
