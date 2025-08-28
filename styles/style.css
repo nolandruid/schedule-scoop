@@ -1090,6 +1090,21 @@ input:checked + .toggle-switch::before{
   font-size: 16px;
 }
 
+/* Export info message styling */
+.export-info-container {
+  margin: 8px 0;
+  padding: 0 20px;
+}
+
+.export-info-text {
+  display: flex;
+  align-items: center;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #4CAF50;
+}
+
 /* Calendar option selection styles */
 .panel .nav-links li .sub-menu a.calendar-option {
   border-radius: 8px;
