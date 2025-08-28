@@ -1097,15 +1097,15 @@ input:checked + .toggle-switch::before{
 }
 
 .panel .nav-links li .sub-menu a.calendar-option.selected {
-  background: linear-gradient(to right, #4CAF50, rgba(76, 175, 80, 0.3));
-  border: 2px solid #4CAF50;
+  background: linear-gradient(to right, #5145c4, rgba(76, 175, 80, 0.3));
+  border: 2px solid #5145c4;
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .panel .nav-links li .sub-menu a.calendar-option.selected:hover {
-  background: linear-gradient(to right, #45a049, rgba(69, 160, 73, 0.3));
-  border-color: #45a049;
+  background: linear-gradient(to right, #5e54b8, rgba(69, 160, 73, 0.3));
+  border-color: #5e54b8;
   transform: scale(1.05);
 }
 
@@ -1116,4 +1116,37 @@ input:checked + .toggle-switch::before{
 
 .panel .nav-links li .sub-menu a.calendar-option.selected .force-active {
   font-weight: 600;
+}
+
+/* Developer Credits */
+.developer-credits {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #fff;
+}
+
+.developer-credits .dev-link {
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.developer-credits .dev-link:hover {
+  transform: scale(1.1);
+  color: #2af85d;
+}
+
+.developer-credits:hover .separator {
+  transform: scale(1.1);
+}
+
+.developer-credits .separator {
+  color: #888;
+  font-weight: bold;
+  transition: transform 0.3s ease;
 }
