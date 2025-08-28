@@ -421,8 +421,7 @@ async function getCarletonAndPrivacyPolicy() {
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        const filenameTerm = mapTerm(r) || userInfo2 || 'Term';
-                        a.download = `${filenameTerm}.ics`;
+                        a.download = userInfo2 + '.ics';
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
@@ -527,9 +526,7 @@ async function getCarletonAndPrivacyPolicy() {
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            const filenameTerm = mapTerm(r) || 'Term';
-                            const coursePart = sanitizeFilename(`${node.courseCode}-${node.courseSection}`);
-                            a.download = `${filenameTerm} - ${coursePart}.ics`;
+                            a.download = `${node.courseCode}-${node.courseSection}` + '.ics';
                             document.body.appendChild(a);
                             a.click();
                             document.body.removeChild(a);
@@ -695,22 +692,6 @@ async function getCarletonAndPrivacyPolicy() {
       alert('Unexpected error during timetable processing.\n\nNeuroNest');
       chrome.runtime.sendMessage({ action: 'end-timetable-request' });
       // chrome.runtime.sendMessage({ action: 'closeTempTabs', type: 'tempTimetableCU' });
-    }
-  }
-
-  /**
-   * Sanitizes a string for safe use as a filename
-   * @param {string} name
-   * @returns {string}
-   */
-  function sanitizeFilename(name){
-    try{
-      return String(name)
-        .replace(/[\\/:*?"<>|]/g, '-') // replace illegal filename chars
-        .replace(/\s+/g, ' ')            // collapse whitespace
-        .trim();
-    }catch(err){
-      return 'file';
     }
   }
 
