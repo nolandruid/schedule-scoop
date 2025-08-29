@@ -714,25 +714,6 @@ async function getCarletonAndPrivacyPolicy() {
           }
         };
 
-        /**
-         * Formats a Date object for Microsoft Graph API in local timezone
-         * @param {Date} date - Date object to format
-         * @returns {string} Formatted date string in local timezone (YYYY-MM-DDTHH:mm:ss.000)
-         */
-        const formatDateForOutlook = (date) => {
-          try {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000`;
-          } catch (err) {
-            return date.toISOString();
-          }
-        };
 
         /**
          * Converts 12-hour time format to 24-hour format
@@ -847,6 +828,23 @@ async function getCarletonAndPrivacyPolicy() {
       },
       recurrence: [`RRULE:${neutralEvent.recurrenceRule}`]
     };
+  }
+
+  /**
+   * Formats a Date object for Microsoft Graph API
+   * @param {Date} date - Date object to format (assumed to be in correct local time)
+   * @returns {string} Formatted date string (YYYY-MM-DDTHH:mm:ss.000)
+   */
+  function formatDateForOutlook(date) {
+    // Use the date as-is since it's already created in the correct timezone context
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000`;
   }
 
   /**
