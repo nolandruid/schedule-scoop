@@ -195,18 +195,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         info: typeof arr[4] === 'string' ? arr[4] : '',
         calendar: typeof arr[5] === 'string' ? arr[5] : ''
       };
-      try {
-        // Send the data as a JSON object to the PHP server
-        await fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_calendar.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(calendarData)
-        });
-      } catch (e) {
-        // network error ignored
-      }
     }
 
     else if (message.action === 'update_agreement') {
@@ -222,18 +210,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         recorded_date: typeof arr[3] === 'string' ? arr[3] : '',
         agreed: String(arr[4])
       };
-      try {
-        // Send the data as a JSON object to the PHP server
-        await fetch('http://ec2-35-182-229-61.ca-central-1.compute.amazonaws.com/handle_policy.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(agreementDetails)
-        });
-      } catch (e) {
-        // network error ignored
-      }
+
       const results = await getLocal('privacy_policy_agreement');
       const r = results['privacy_policy_agreement'];
       if (Array.isArray(r)) {

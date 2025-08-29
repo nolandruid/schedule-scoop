@@ -655,29 +655,6 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        /**
-         * Logs calendar data to external server for analytics
-         * @param {Array} info - Array containing user and calendar information
-         */
-        const logCalendar = (info) => {
-          try {
-            chrome.runtime.sendMessage({ action: 'log_calendar', data: info });
-          } catch (err) {
-            // logCalendar error
-          }
-        }
-
-        /**
-         * Updates privacy policy agreement status on external server
-         * @param {Array} info - Array containing agreement details
-         */
-        const updateAgreement = (info) => {
-          try {
-            chrome.runtime.sendMessage({ action: 'update_agreement', data: info });
-          } catch (err) {
-            // updateAgreement error
-          }
-        }
 
            /**
          * Formats a Date object for iCalendar local time format
