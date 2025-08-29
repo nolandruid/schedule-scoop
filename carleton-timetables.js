@@ -61,7 +61,7 @@ async function getCarletonAndPrivacyPolicy() {
 
   try {
     if (document.title.trim() == 'Sign In') {
-      // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempTimetableCU'})
+      // chrome.runtime.sendMessage({action:'closeTempTabs', type:'tempLoginCU'})
     }
     else if (document.title.trim() == 'Sign out') {
       // chrome.runtime.sendMessage({action:'redirect', href:'https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd'})
@@ -679,19 +679,26 @@ async function getCarletonAndPrivacyPolicy() {
           }
         }
 
-        /**
+           /**
          * Formats a Date object for iCalendar local time format
          * @param {Date} date - Date object to format
          * @returns {string} Formatted date string in YYYYMMDDTHHMMSS format
          */
-        const formatDateLocal = (date) => {
-          try {
-            return date.toISOString().replace(/[-:]/g, '').split('.')[0];
-          } catch (err) {
-            // formatDateLocal error
-            return '';
-          }
-        };
+           const formatDateLocal = (date) => {
+            try {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              const hours = String(date.getHours()).padStart(2, '0');
+              const minutes = String(date.getMinutes()).padStart(2, '0');
+              const seconds = String(date.getSeconds()).padStart(2, '0');
+              
+              return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+            } catch (err) {
+              // formatDateLocal error
+              return '';
+            }
+          };
 
         /**
          * Formats a Date object for iCalendar UTC time format
@@ -704,6 +711,26 @@ async function getCarletonAndPrivacyPolicy() {
           } catch (err) {
             // formatDateUTC error
             return '';
+          }
+        };
+
+        /**
+         * Formats a Date object for Microsoft Graph API in local timezone
+         * @param {Date} date - Date object to format
+         * @returns {string} Formatted date string in local timezone (YYYY-MM-DDTHH:mm:ss.000)
+         */
+        const formatDateForOutlook = (date) => {
+          try {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000`;
+          } catch (err) {
+            return date.toISOString();
           }
         };
 
@@ -875,11 +902,11 @@ async function getCarletonAndPrivacyPolicy() {
         content: neutralEvent.description || ''
       },
       start: {
-        dateTime: neutralEvent.startDateTime.toISOString(),
+        dateTime: formatDateForOutlook(neutralEvent.startDateTime),
         timeZone: neutralEvent.timezone || 'America/Toronto'
       },
       end: {
-        dateTime: neutralEvent.endDateTime.toISOString(),
+        dateTime: formatDateForOutlook(neutralEvent.endDateTime),
         timeZone: neutralEvent.timezone || 'America/Toronto'
       }
     };
