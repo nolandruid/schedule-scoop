@@ -92,7 +92,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Handle Outlook Calendar token request synchronously
   if (message.action === 'getOutlookCalendarToken') {
     const clientId = '4e6fdfa3-e2e0-4893-a3c4-527ea3dd4ce4';
-    const redirectUri = `https://igdhlfppjiihpfifblcodlbcehgimkpf.chromiumapp.org/`;
+    const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org/`;
     const scope = 'https://graph.microsoft.com/calendars.readwrite';
     
     const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?` +

@@ -26,7 +26,7 @@
   },
 
   "oauth2":{
-    "client_id": "318919291132-9bacc4qts4elfvecovmdmukovm7th8hf.apps.googleusercontent.com",
+    "client_id": "318919291132-2f8il4ll5c0pqq2uqi85j713gau07kjc.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/calendar.events"]
   },
   
