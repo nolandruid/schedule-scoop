@@ -1136,6 +1136,18 @@ input:checked + .toggle-switch::before{
   font-weight: 600;
 }
 
+/* Outlook message styling */
+.outlook-message {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.outlook-message.hidden {
+  display: none;
+}
+
 .developer-credits {
   display: flex;
   align-items: center;

@@ -559,6 +559,16 @@ function selectCalendar(calendarType) {
     selectedOption.classList.add('selected');
   }
   
+  // Show/hide Outlook message based on selection
+  const outlookMessage = document.getElementById('outlook-message');
+  if (outlookMessage) {
+    if (calendarType === 'outlook') {
+      outlookMessage.classList.remove('hidden');
+    } else {
+      outlookMessage.classList.add('hidden');
+    }
+  }
+  
   // Store selected calendar type
   setLocal('selected-calendar', calendarType);
 }
