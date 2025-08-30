@@ -18,7 +18,14 @@
 
   "permissions": ["scripting", "storage", "activeTab", "webNavigation", "identity"],
   
-  "host_permissions": ["<all_urls>", "https://www.googleapis.com/*", "https://graph.microsoft.com/*"],
+  "host_permissions": [
+    "https://cufed.carleton.ca/*",
+    "https://central.carleton.ca/*", 
+    "https://ssoman.carleton.ca/*",
+    "https://360.carleton.ca/*",
+    "https://www.googleapis.com/*",
+    "https://graph.microsoft.com/*"
+  ],
 
 
   "content_security_policy": {
