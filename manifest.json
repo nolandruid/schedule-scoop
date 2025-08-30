@@ -3,9 +3,9 @@
 
   "manifest_version": 3,
 
-  "name": "Timetable Tools",
+  "name": "ScheduleScoop",
   
-  "short_name": "Timetable Tools",
+  "short_name": "ScheduleScoop",
 
   "version": "2.5.8.0",
   
@@ -34,7 +34,7 @@
       "service_worker": "background.js"
     },
   "action": {
-    "default_title": "Timetable Tools",
+    "default_title": "ScheduleScoop",
     "default_icon": "images/calendar128.png",
     "default_popup": "popup.html"
   },
