@@ -143,9 +143,72 @@
     return { events, skippedSections };
   }
 
+  const TZID = 'America/Toronto';
+  const VTIMEZONE = [
+    'BEGIN:VTIMEZONE', `TZID:${TZID}`,
+    'BEGIN:DAYLIGHT', 'TZOFFSETFROM:-0500', 'TZOFFSETTO:-0400', 'TZNAME:EDT',
+    'DTSTART:19700308T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU', 'END:DAYLIGHT',
+    'BEGIN:STANDARD', 'TZOFFSETFROM:-0400', 'TZOFFSETTO:-0500', 'TZNAME:EST',
+    'DTSTART:19701101T020000', 'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU', 'END:STANDARD',
+    'END:VTIMEZONE',
+  ];
+
+  const icsText = (s) => String(s || '')
+    .replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const icsLocal = (date, time) => `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
+  const utcStamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+
+  function fold(line) {
+    const enc = new TextEncoder();
+    const out = [];
+    let current = '';
+    let bytes = 0;
+    for (const ch of line) {
+      const n = enc.encode(ch).length;
+      const limit = out.length === 0 ? 75 : 74; // continuation lines start with a space
+      if (bytes + n > limit) { out.push(current); current = ''; bytes = 0; }
+      current += ch;
+      bytes += n;
+    }
+    out.push(current);
+    return out.join('\r\n ');
+  }
+
+  // RRULE for an event. UNTIL is the day after `until` at 04:59:59Z, which is 23:59:59 EST or
+  // 00:59:59 EDT, so a class on the last evening is always included.
+  function rrule(e) {
+    const until = `${addDays(e.until, 1).replace(/-/g, '')}T045959Z`;
+    return `FREQ=WEEKLY;INTERVAL=${e.interval};BYDAY=${e.byDay};UNTIL=${until};WKST=SU`;
+  }
+
+  function toICS(events, { now }) {
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ScheduleScoop//Timetable Export//EN', 'CALSCALE:GREGORIAN', ...VTIMEZONE];
+    for (const e of events) {
+      lines.push(
+        'BEGIN:VEVENT',
+        `UID:${e.uid}`,
+        `DTSTAMP:${utcStamp(now)}`,
+        `DTSTART;TZID=${TZID}:${icsLocal(e.date, e.start)}`,
+        `DTEND;TZID=${TZID}:${icsLocal(e.date, e.end)}`,
+        `RRULE:${rrule(e)}`,
+        ...e.exDates.map((d) => `EXDATE;TZID=${TZID}:${icsLocal(d, e.start)}`),
+        `SUMMARY:${icsText(e.title)}`,
+        `DESCRIPTION:${icsText(e.description)}`,
+        `LOCATION:${icsText(e.location)}`,
+        'END:VEVENT',
+      );
+    }
+    lines.push('END:VCALENDAR');
+    return lines.map(fold).join('\r\n') + '\r\n';
+  }
+
+  function icsFilename(code, year) {
+    return `ScheduleScoop-${TERM_NAMES[code]}-${year}.ics`;
+  }
+
   const api = {
     termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday, skippedDates,
-    firstMeetingDate, buildEvents,
+    firstMeetingDate, buildEvents, toICS, icsFilename, rrule, icsLocal,
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
