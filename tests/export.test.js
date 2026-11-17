@@ -39,6 +39,22 @@ test('Google: a failed event is counted and the rest continue', async () => {
   assert.deepEqual(await exportToGoogle([event(1), event(2), event(3)], opts(fetch)), { created: 2, failed: 1 });
 });
 
+test('auth error after some events reports how many were created', async () => {
+  const fetch = fakeFetch((m, u, n) => ({ status: n === 1 ? 200 : 401 }));
+  await assert.rejects(exportToGoogle([event(1), event(2), event(3)], opts(fetch)), (err) => err.message === 'auth' && err.created === 1);
+});
+
+test('Outlook: evening class on a skipped day is still deleted', async () => {
+  const fetch = fakeFetch((method) => {
+    if (method === 'POST') return { status: 201, body: { id: 'S1' } };
+    if (method === 'GET') return { body: { value: [{ id: 'I-eve', start: { dateTime: '2027-02-17T19:05:00.0000000' } }] } };
+    return { status: 204 };
+  });
+  const r = await exportToOutlook([event(1, ['2027-02-17'])], opts(fetch));
+  assert.equal(r.skipFailures, 0);
+  assert.equal(fetch.calls.at(-1).url, 'https://graph.microsoft.com/v1.0/me/events/I-eve');
+});
+
 test('Google: 401 aborts with auth error', async () => {
   const fetch = fakeFetch(() => ({ status: 401 }));
   await assert.rejects(exportToGoogle([event(1), event(2)], opts(fetch)), { message: 'auth' });
@@ -61,7 +77,8 @@ test('Outlook: creates series then deletes skipped instances only', async () => 
   const [post, get, del] = fetch.calls;
   assert.equal(post.url, 'https://graph.microsoft.com/v1.0/me/events');
   assert.ok(get.url.startsWith('https://graph.microsoft.com/v1.0/me/events/S1/instances?'));
-  assert.ok(get.url.includes('startDateTime=2027-02-17T00:00:00') && get.url.includes('endDateTime=2027-02-18T00:00:00'));
+  // Graph reads offset-less times as UTC; the window must cover the whole Toronto day, evenings included.
+  assert.ok(get.url.includes('startDateTime=2027-02-16T12:00:00Z') && get.url.includes('endDateTime=2027-02-18T12:00:00Z'), get.url);
   assert.equal(get.opts.headers.Prefer, 'outlook.timezone="America/Toronto"');
   assert.deepEqual([del.method, del.url], ['DELETE', 'https://graph.microsoft.com/v1.0/me/events/I-skip']);
   assert.equal(fetch.calls.length, 3);

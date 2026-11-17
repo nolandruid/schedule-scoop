@@ -72,7 +72,19 @@
     return sections;
   }
 
-  const api = { parseSchedulePage };
+  // "Winter 2027" from the first "Associated Term:" row, or null when the page doesn't show one.
+  function shownTerm(doc) {
+    const th = [...doc.querySelectorAll('th.ddlabel')].find((x) => clean(x) === 'Associated Term:');
+    const td = th && th.parentElement.querySelector('td');
+    const m = td && /^(Winter|Summer|Fall) \d{4}/.exec(clean(td));
+    return m ? m[0] : null;
+  }
+
+  function detailUrl(code, year) {
+    return `https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl?term_in=${year}${code}`;
+  }
+
+  const api = { parseSchedulePage, shownTerm, detailUrl };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else globalThis.ScheduleScoop.parseSchedulePage = parseSchedulePage;
+  else Object.assign(globalThis.ScheduleScoop, api);
 })();

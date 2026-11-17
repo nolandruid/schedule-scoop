@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { parseHTML } = require('linkedom');
-const { parseSchedulePage } = require('../src/carleton-parse.js');
+const { parseSchedulePage, shownTerm, detailUrl } = require('../src/carleton-parse.js');
 
 const load = (file) => parseHTML(fs.readFileSync(file, 'utf8')).document;
 const meeting = (days, start, end, location, type = 'Lecture') => ({
@@ -50,4 +50,14 @@ test('parses the real saved page (private, skipped when absent)', { skip: privat
       }
     }
   }
+});
+
+test('shownTerm reads the associated term from the detail page', () => {
+  const doc = load(path.join(__dirname, 'fixtures/detail-schedule.sample.html'));
+  assert.equal(shownTerm(doc), 'Winter 2027');
+  assert.equal(shownTerm(parseHTML('<html><body></body></html>').document), null);
+});
+
+test('detailUrl asks Carleton for a specific term', () => {
+  assert.equal(detailUrl('10', '2027'), 'https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl?term_in=202710');
 });

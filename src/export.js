@@ -20,7 +20,11 @@
       } catch (err) {
         res = null;
       }
-      if (res && res.status === 401) throw new Error('auth');
+      if (res && res.status === 401) {
+        const err = new Error('auth');
+        err.created = created; // events already added before the sign-in expired
+        throw err;
+      }
       if (res && res.ok) {
         created++;
         if (afterCreate) await afterCreate(events[i], await res.json());
@@ -44,7 +48,9 @@
     const removeSkipped = async (event, created) => {
       for (const day of event.exDates) {
         try {
-          const range = `startDateTime=${day}T00:00:00&endDateTime=${schedule.addDays(day, 1)}T00:00:00`;
+          // Graph reads these as UTC. Noon UTC the day before to noon UTC the day after covers the whole
+          // Toronto day (EST or EDT); the startsWith(day) filter below keeps only that day's instance.
+          const range = `startDateTime=${schedule.addDays(day, -1)}T12:00:00Z&endDateTime=${schedule.addDays(day, 1)}T12:00:00Z`;
           const res = await fetch(`${GRAPH}/${encodeURIComponent(created.id)}/instances?${range}`, {
             headers: headers(token, { Prefer: 'outlook.timezone="America/Toronto"' }),
           });

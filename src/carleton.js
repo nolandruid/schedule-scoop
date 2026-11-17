@@ -6,9 +6,8 @@
   if (window.__scheduleScoopBusy) return;
   window.__scheduleScoopBusy = true;
 
-  const { schedule, parseSchedulePage, exporters, statusCard: card } = globalThis.ScheduleScoop;
+  const { schedule, parseSchedulePage, shownTerm, detailUrl, exporters, statusCard: card } = globalThis.ScheduleScoop;
   const SSO_URL = 'https://ssoman.carleton.ca/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchd';
-  const DETAIL_URL = 'https://central.carleton.ca/prod/bwskfshd.P_CrseSchdDetl';
   const CALENDAR_NAMES = { google: 'Google Calendar', outlook: 'Outlook', ics: '.ics file' };
 
   const storage = (keys) => chrome.storage.local.get(keys);
@@ -96,6 +95,11 @@
       } catch (err) {
         if (err.message === 'auth') {
           if (settings.calendar === 'google') chrome.runtime.sendMessage({ action: 'clearGoogleToken', token });
+          if (err.created > 0) {
+            await recordExport(settings);
+            return fail(`Your ${name} sign-in expired after ${plural(err.created, 'event', 'events')} were added`,
+              `Delete those from ${name} before exporting again, or you'll get duplicates.`);
+          }
           return fail(`Your ${name} sign-in expired`, 'Press Export to sign in again.');
         }
         return fail(`Couldn't add events to ${name}`, 'Check your connection and try again.');
@@ -109,20 +113,33 @@
       card.show({ state: 'success', title: `Added ${plural(result.created, 'event', 'events')} to ${name}`, detail: notes.join('\n') || `Your ${term} classes are in your calendar.`, link });
     }
 
+    await recordExport(settings);
+    finish();
+  }
+
+  async function recordExport(settings) {
     const key = `${settings.code}-${settings.year}-${settings.calendar}`;
     await chrome.storage.local.set({ 'export-history': { ...settings.history, [key]: new Date().toISOString() } });
-    finish();
   }
 
   async function onDetailSchedule(settings) {
     const term = schedule.termLabel(settings.code, settings.year);
     card.show({ state: 'working', title: `Reading ${term}…` });
 
-    const shownTerm = [...document.querySelectorAll('th.ddlabel')].find((th) => th.textContent.trim() === 'Associated Term:');
-    if (shownTerm && !shownTerm.nextElementSibling.textContent.trim().startsWith(term)) {
-      location.href = DETAIL_URL; // shows the term picker for the right term
-      return;
+    // The page can show another term (Carleton remembers the last one viewed). Ask for ours once;
+    // if it still doesn't match, stop instead of redirecting forever.
+    const shown = shownTerm(document);
+    const redirectKey = `scheduleScoopTermRedirect-${settings.year}${settings.code}`;
+    if (shown && shown !== term) {
+      if (!sessionStorage.getItem(redirectKey)) {
+        sessionStorage.setItem(redirectKey, '1');
+        location.href = detailUrl(settings.code, settings.year);
+        return;
+      }
+      sessionStorage.removeItem(redirectKey);
+      return fail(`Carleton Central showed ${shown} instead of ${term}`, `Open your ${term} Detail Schedule on Carleton Central, then press Export.`);
     }
+    sessionStorage.removeItem(redirectKey);
 
     const sections = parseSchedulePage(document);
     const { events, skippedSections } = schedule.buildEvents(sections, settings);
