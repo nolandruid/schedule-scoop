@@ -1,60 +1,44 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
-
+  "update_url": "https://clients2.google.com/service/update2/crx",
   "manifest_version": 3,
-
   "name": "ScheduleScoop",
-  
   "short_name": "ScheduleScoop",
-
-  "version": "2.5.8.0",
-  
-  "description": "Export Timetables",
- 
+  "version": "3.0.0",
+  "description": "Export your Carleton timetable to Google Calendar, Outlook or an .ics file",
   "icons": {
     "48": "images/calendar128.png",
     "128": "images/calendar128.png"
   },
-
-  "permissions": ["scripting", "storage", "activeTab", "webNavigation", "identity"],
-  
+  "permissions": [
+    "scripting",
+    "storage",
+    "activeTab",
+    "webNavigation",
+    "identity"
+  ],
   "host_permissions": [
     "https://cufed.carleton.ca/*",
-    "https://central.carleton.ca/*", 
+    "https://central.carleton.ca/*",
     "https://ssoman.carleton.ca/*",
     "https://360.carleton.ca/*",
     "https://www.googleapis.com/*",
     "https://graph.microsoft.com/*"
   ],
-
-
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; 'unsafe-inline' 'self'"
   },
-
-  "oauth2":{
+  "oauth2": {
     "client_id": "318919291132-2f8il4ll5c0pqq2uqi85j713gau07kjc.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/calendar.events"]
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.events"
+    ]
   },
-  
   "background": {
-      "service_worker": "background.js"
-    },
+    "service_worker": "background.js"
+  },
   "action": {
     "default_title": "ScheduleScoop",
     "default_icon": "images/calendar128.png",
     "default_popup": "popup.html"
-  },
-  
-  "web_accessible_resources": [{
-    "resources": [
-      "*.html",
-      "*.woff2",
-      "*.tff",
-      "images/*",
-      "*.js",
-      "styles/*"
-    ],
-    "matches": ["<all_urls>"]
-  }]
+  }
 }

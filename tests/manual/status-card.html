@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Status card states</title>
+<style>
+  body { font-family: Verdana, sans-serif; background: #f4f4f4; color: #222; padding: 24px; }
+  @media (prefers-color-scheme: dark) { body { background: #111; color: #ddd; } }
+  button { margin: 4px; }
+</style>
+</head>
+<body>
+<p>Manual harness for <code>src/status-card.js</code>. The page styles here deliberately clash (like Carleton Central's) to check isolation.</p>
+<button id="working">working</button>
+<button id="progress">progress</button>
+<button id="confirm">confirm</button>
+<button id="success">success</button>
+<button id="error">error</button>
+<script src="../../src/status-card.js"></script>
+<script>
+  const card = ScheduleScoop.statusCard;
+  document.getElementById('working').onclick = () => card.show({ state: 'working', title: 'Reading Winter 2027…' });
+  document.getElementById('progress').onclick = () => {
+    let done = 0;
+    const tick = () => {
+      card.show({ state: 'progress', title: 'Adding to Google Calendar', detail: `7 courses found · ${done} of 14 events`, progress: { done, total: 14 } });
+      if (done++ < 14) setTimeout(tick, 150);
+    };
+    tick();
+  };
+  document.getElementById('confirm').onclick = () => card.show({
+    state: 'confirm', title: 'You already exported Winter 2027 to Google Calendar on Nov 3',
+    detail: 'Export again? This will create duplicates.',
+    actions: [{ label: 'Cancel', onClick: () => card.hide() }, { label: 'Export again', primary: true, onClick: () => card.show({ state: 'working', title: 'Exporting…' }) }],
+  });
+  document.getElementById('success').onclick = () => card.show({
+    state: 'success', title: 'Added 14 events to Google Calendar', detail: '1 course had no set times and was skipped.',
+    link: { label: 'Open Google Calendar', href: 'https://calendar.google.com/calendar/r/week/2027/01/06' },
+  });
+  document.getElementById('error').onclick = () => card.show({
+    state: 'error', title: "Winter 2027 isn't on your Carleton account", detail: 'Pick another term in ScheduleScoop.',
+  });
+</script>
+</body>
+</html>
