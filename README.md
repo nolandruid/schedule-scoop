@@ -6,9 +6,13 @@ A Chrome extension that helps Carleton University students easily export their c
 
 - **Multiple Calendar Support**: Export directly to Google Calendar, Outlook or download as ICS files
 - **Smart Course Detection**: Automatically handles lectures, tutorials, and labs with proper scheduling
-- **Biweekly Lab Support**: Labs are correctly scheduled as biweekly recurring events
+- **Weekly or Biweekly Labs**: Choose whether labs repeat every week or every 2 weeks
 - **Tutorial/Lab Week Adjustment**: Tutorials and labs start in the second week of term
+- **Reading Week and Holidays Skipped**: No classes are added on reading week or statutory holidays
+- **Live Progress**: A status card on Carleton Central shows each step and the result
+- **Duplicate Warning**: Exporting the same term to the same calendar twice asks before adding duplicates
 - **Term Selection**: Support for Winter, Summer, and Fall terms
+- **Light and Dark Mode**: Follows your system setting
 
 ## Installation
 
@@ -21,16 +25,17 @@ A Chrome extension that helps Carleton University students easily export their c
 ### Step 1: Configure Your Export
 1. Click the Schedule Scoop extension icon in your toolbar
 2. **Select Term**: Choose your term (Winter/Summer/Fall) and year
-3. **Select Calendar**: Choose your preferred calendar service:
+3. **Labs**: Choose "Every week" or "Every 2 weeks"
+4. **Select Calendar**: Choose your preferred calendar service:
    - **Google Calendar**: Direct integration (requires Google account)
    - **Outlook**: Direct integration (requires personal Microsoft account. cmail not supported)
    - **ICS File**: Standard calendar file for any calendar app
 
 ### Step 2: Export Your Timetable
-1. Click **"Export Timetable"**
-2. Keep the tab open during processing (~10 seconds)
-3. Follow any authentication prompts for calendar services
-4. Your courses will be automatically added to your selected calendar
+1. Click **Export**. ScheduleScoop opens Carleton Central (sign in if asked)
+2. Watch the status card in the bottom-right corner of the Carleton tab
+3. Follow any sign-in prompt for Google or Outlook
+4. The card tells you when your classes are in your calendar, or what went wrong
 
 ## Calendar Integration Details
 
@@ -60,7 +65,17 @@ A Chrome extension that helps Carleton University students easily export their c
 
 ### Labs
 - Start in the **second week** of term
-- **Biweekly recurrence** (every other week) from the second week
+- **Biweekly recurrence** (every other week) by default, or weekly if you pick "Every week"
+
+### Skipped days
+- Reading week (Winter: the Family Day week; Fall: Carleton's fall break)
+- Statutory holidays during the term: Labour Day, Thanksgiving, Good Friday, Victoria Day, Canada Day and the Civic Holiday
+
+## Development
+
+- `npm install`, then `npm test` runs the unit tests (Node's built-in test runner)
+- `tests/manual/popup-preview.html` and `tests/manual/status-card.html` preview the popup and status card in a normal browser tab (serve the repo root, e.g. `python3 -m http.server`)
+- Saved Carleton pages for local testing go in `tests/fixtures/private/`, which git ignores
 
 ## Privacy & Security
 

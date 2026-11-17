@@ -1,4 +1,4 @@
-# Timetable Tools - Development Tasks
+# ScheduleScoop - Development Tasks
 
 A Chrome extension that helps Carleton University students export their course timetables directly to their preferred calendar service (Google Calendar, Outlook, Apple Calendar, etc.) through direct integration.
 
@@ -7,7 +7,7 @@ A Chrome extension that helps Carleton University students export their course t
 - [*] Website injection approach implemented
 - [*] Chrome extension manifest configured
 - [*] Needs direct calendar integration implementation
-- [ ] Needs UI/UX improvements for calendar selection
+- [*] Needs UI/UX improvements for calendar selection
 - [ ] Needs code cleanup and modernization
 
 ---
@@ -121,7 +121,7 @@ A Chrome extension that helps Carleton University students export their course t
   </details>
 
 ### Enhance injected UI (2-3 hours)
-- [ ] **Design contextual export button**
+- [*] **Design contextual export button**
   <details>
   <summary>Details</summary>
   > **What**: Create a clean, contextual export button that appears on Carleton timetable pages
@@ -137,7 +137,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Display step-by-step progress like "Extracting courses...", "Connecting to Google Calendar...", "Importing events..."
   </details>
 
-- [ ] **Implement proper error messaging**
+- [*] **Implement proper error messaging**
   <details>
   <summary>Details</summary>
   > **What**: Show user-friendly error messages when something goes wrong
@@ -159,7 +159,7 @@ A Chrome extension that helps Carleton University students export their course t
 <summary><strong>Phase 3: Core Functionality Refactor (6-8 hours)</strong></summary>
 
 ### Modularize timetable logic (4-5 hours)
-- [ ] **Break down carleton-timetables.js into smaller, focused functions**
+- [*] **Break down carleton-timetables.js into smaller, focused functions**
   <details>
   <summary>Details</summary>
   > **What**: Split the large 473-line file into smaller, more manageable functions
@@ -200,7 +200,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Create a simple state enum (IDLE, EXTRACTING, INTEGRATING, COMPLETE, ERROR) and manage transitions
   </details>
 
-- [ ] **Implement proper loading states**
+- [*] **Implement proper loading states**
   <details>
   <summary>Details</summary>
   > **What**: Add visual feedback when the extension is working
@@ -208,7 +208,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Show loading spinners, progress bars, or status messages during extraction and integration
   </details>
 
-- [ ] **Handle edge cases (no courses, network errors, etc.)**
+- [*] **Handle edge cases (no courses, network errors, etc.)**
   <details>
   <summary>Details</summary>
   > **What**: Add handling for scenarios like no courses enrolled, network failures, or invalid data
@@ -310,7 +310,7 @@ A Chrome extension that helps Carleton University students export their course t
   </details>
 
 ### Prepare for deployment (1-1 hours)
-- [ ] **Update manifest.json version**
+- [*] **Update manifest.json version**
   <details>
   <summary>Details</summary>
   > **What**: Increment the version number in manifest.json
@@ -395,7 +395,7 @@ A Chrome extension that helps Carleton University students export their course t
 <summary><strong>Technical Debt Items (2-3 hours)</strong></summary>
 
 ### Security improvements (1-2 hours)
-- [ ] **Audit permissions in manifest.json**
+- [*] **Audit permissions in manifest.json**
   <details>
   <summary>Details</summary>
   > **What**: Review all permissions requested by the extension
@@ -428,7 +428,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Audit all network requests and ensure data stays local
   </details>
 
-- [ ] **Add ARIA labels**
+- [*] **Add ARIA labels**
   <details>
   <summary>Details</summary>
   > **What**: Add accessibility labels to UI elements
@@ -436,7 +436,7 @@ A Chrome extension that helps Carleton University students export their course t
   > **How**: Add aria-label attributes to buttons, inputs, and other interactive elements
   </details>
 
-- [ ] **Ensure keyboard navigation**
+- [*] **Ensure keyboard navigation**
   <details>
   <summary>Details</summary>
   > **What**: Make sure all functionality can be accessed via keyboard
