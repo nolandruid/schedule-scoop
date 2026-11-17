@@ -96,7 +96,57 @@
     return [...new Set(days)].filter((d) => weekday(d) !== 0 && weekday(d) !== 6).sort();
   }
 
-  const api = { termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday, skippedDates };
+  const DAY_CODES = { M: 'MO', T: 'TU', W: 'WE', R: 'TH', F: 'FR', S: 'SA', U: 'SU' };
+  const DAY_NUMBERS = { M: 1, T: 2, W: 3, R: 4, F: 5, S: 6, U: 0 };
+
+  // Today's rule, kept: tutorials and labs start in week two unless their weekday is
+  // earlier in the week than the term's first day (then the first match is already week two).
+  function firstMeetingDate(startDate, letter, type) {
+    const startDay = weekday(startDate);
+    let diff = DAY_NUMBERS[letter] - startDay;
+    const earlier = diff < 0;
+    if (earlier) diff += 7;
+    const t = (type || '').toLowerCase();
+    if ((t.includes('tutorial') || t.includes('lab')) && !earlier) diff += 7;
+    return addDays(startDate, diff);
+  }
+
+  function buildEvents(sections, { code, year, labsBiweekly }) {
+    const skipped = new Set(skippedDates(code, year));
+    const events = [];
+    let skippedSections = 0;
+    for (const s of sections) {
+      const timed = (s.meetings || []).filter((m) => m.start && m.end && m.days);
+      if (timed.length === 0) { skippedSections++; continue; }
+      const isLab = (s.type || '').toLowerCase().includes('lab');
+      const interval = isLab && labsBiweekly ? 2 : 1;
+      for (const m of timed) {
+        for (const letter of m.days.replace(/\s/g, '')) {
+          if (!DAY_CODES[letter]) continue;
+          const date = firstMeetingDate(m.startDate, letter, s.type);
+          if (date > m.endDate) continue;
+          const exDates = [];
+          for (let d = date; d <= m.endDate; d = addDays(d, interval * 7)) {
+            if (skipped.has(d)) exDates.push(d);
+          }
+          const byDay = DAY_CODES[letter];
+          events.push({
+            uid: `${s.code}-${s.section}-${byDay}-${m.start.replace(':', '')}-${year}${code}@schedulescoop`.replace(/\s/g, ''),
+            title: `${s.code} ${s.type}`,
+            description: [s.name, `Section ${s.section}`, s.instructor, `CRN ${s.crn}`, m.location || 'Location TBA'].join('\n'),
+            location: m.location || '',
+            date, start: m.start, end: m.end, byDay, interval, until: m.endDate, exDates,
+          });
+        }
+      }
+    }
+    return { events, skippedSections };
+  }
+
+  const api = {
+    termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday, skippedDates,
+    firstMeetingDate, buildEvents,
+  };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else {
