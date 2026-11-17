@@ -206,9 +206,36 @@
     return `ScheduleScoop-${TERM_NAMES[code]}-${year}.ics`;
   }
 
+  const wall = (date, time) => ({ dateTime: `${date}T${time}:00`, timeZone: TZID });
+  const OUTLOOK_DAYS = { MO: 'monday', TU: 'tuesday', WE: 'wednesday', TH: 'thursday', FR: 'friday', SA: 'saturday', SU: 'sunday' };
+
+  function toGoogleEvent(e) {
+    const recurrence = [`RRULE:${rrule(e)}`];
+    if (e.exDates.length) recurrence.push(`EXDATE;TZID=${TZID}:${e.exDates.map((d) => icsLocal(d, e.start)).join(',')}`);
+    return {
+      summary: e.title, description: e.description, location: e.location,
+      start: wall(e.date, e.start), end: wall(e.date, e.end), recurrence,
+    };
+  }
+
+  function toOutlookEvent(e) {
+    const o = {
+      subject: e.title,
+      body: { contentType: 'text', content: e.description },
+      start: wall(e.date, e.start),
+      end: wall(e.date, e.end),
+      recurrence: {
+        pattern: { type: 'weekly', interval: e.interval, daysOfWeek: [OUTLOOK_DAYS[e.byDay]], firstDayOfWeek: 'sunday' },
+        range: { type: 'endDate', startDate: e.date, endDate: e.until, recurrenceTimeZone: TZID },
+      },
+    };
+    if (e.location && e.location.trim()) o.location = { displayName: e.location };
+    return o;
+  }
+
   const api = {
     termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday, skippedDates,
-    firstMeetingDate, buildEvents, toICS, icsFilename, rrule, icsLocal,
+    firstMeetingDate, buildEvents, toICS, icsFilename, rrule, icsLocal, toGoogleEvent, toOutlookEvent,
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
