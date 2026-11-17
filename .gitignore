@@ -10,3 +10,6 @@ Screenshots/
 ._*
 .Spotlight-V100
 .Trashes
+# Saved Carleton pages with personal data (never commit)
+tests/fixtures/private/
+node_modules/

@@ -1,0 +1,10 @@
+{
+  "name": "schedule-scoop",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.0"
+  }
+}
