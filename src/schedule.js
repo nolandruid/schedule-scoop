@@ -52,7 +52,51 @@
     return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
   }
 
-  const api = { termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday };
+  // Fall break Mondays confirmed from Carleton's academic dates. Other years use the fallback rule.
+  const FALL_BREAK_MONDAY = { 2025: '2025-10-27', 2026: '2026-10-26' };
+
+  function nthMonday(year, month, n) {
+    const first = toISO(year, month, 1);
+    const offset = (8 - weekday(first)) % 7; // days until first Monday
+    return addDays(first, offset + 7 * (n - 1));
+  }
+
+  function easterSunday(year) {
+    // Anonymous Gregorian algorithm
+    const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+    const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return toISO(year, month, day);
+  }
+
+  const weekOf = (monday) => [0, 1, 2, 3, 4].map((n) => addDays(monday, n));
+
+  function lastFullWeekOfOctober(year) {
+    let friday = toISO(year, 10, 31);
+    while (weekday(friday) !== 5) friday = addDays(friday, -1);
+    return addDays(friday, -4);
+  }
+
+  function skippedDates(code, year) {
+    const y = Number(year);
+    let days = [];
+    if (code === '10') {
+      days = [...weekOf(nthMonday(y, 2, 3)), addDays(easterSunday(y), -2)];
+    } else if (code === '30') {
+      days = [...weekOf(FALL_BREAK_MONDAY[y] || lastFullWeekOfOctober(y)), nthMonday(y, 10, 2), nthMonday(y, 9, 1)];
+    } else if (code === '20') {
+      let victoria = toISO(y, 5, 24);
+      while (weekday(victoria) !== 1) victoria = addDays(victoria, -1);
+      days = [victoria, toISO(y, 7, 1), nthMonday(y, 8, 1)];
+    }
+    return [...new Set(days)].filter((d) => weekday(d) !== 0 && weekday(d) !== 6).sort();
+  }
+
+  const api = { termLabel, defaultTerm, yearOptions, parseTime12, parseCarletonDate, addDays, weekday, skippedDates };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else {
